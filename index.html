@@ -16,8 +16,11 @@
   <!-- Header / Navbar -->
   <header class="bg-slate-800 border-b border-slate-700 px-6 py-4 flex flex-col md:flex-row justify-between items-center shadow-lg gap-4">
     <div class="flex items-center gap-3">
-      <div class="bg-blue-600 p-2.5 rounded-lg text-white font-bold text-xl">
-        <i class="fa-solid fa-server"></i>
+      <!-- Logo da BH Cabines (Substitua 'logo.png' pelo arquivo da sua logo ou mantenha o ícone) -->
+      <div class="bg-blue-600 p-2 rounded-lg text-white font-bold flex items-center justify-center w-12 h-12 overflow-hidden shadow">
+        <!-- Descomente a linha abaixo quando colocar a sua logo na pasta do projeto: -->
+        <img src="logo.png" alt="BH Cabines" class="w-full h-full object-contain" /> -->
+        <i class="fa-solid fa-server text-xl"></i>
       </div>
       <div>
         <h1 class="text-xl font-bold tracking-wide">BH CABINES</h1>
@@ -142,8 +145,10 @@
 
   </main>
 
-  <footer class="bg-slate-800 border-t border-slate-700 py-4 text-center text-xs text-slate-500">
-    BH Cabines T.I Infrastructure Demo &copy; 2026 - Zabbix & LibreNMS Integration
+  <!-- Rodapé com o nome do desenvolvedor -->
+  <footer class="bg-slate-800 border-t border-slate-700 py-4 px-6 text-center text-xs text-slate-400 flex flex-col md:flex-row justify-between items-center gap-2">
+    <div>BH Cabines T.I Infrastructure Demo &copy; 2026 - Zabbix & LibreNMS Integration</div>
+    <div>Desenvolvido por <strong class="text-blue-400">Ricardo Adriano Silva</strong></div>
   </footer>
 
   <!-- Lógica JavaScript -->
@@ -152,7 +157,6 @@
 
     async function fetchDashboardData() {
       try {
-        // Altere o caminho abaixo para o seu arquivo JSON publicado no repositório ou servidor local
         const response = await fetch('./bh_cabines_assets.json');
         if (!response.ok) throw new Error("Erro ao carregar os dados");
         
@@ -165,22 +169,18 @@
     }
 
     function renderDashboard(data) {
-      // 1. Atualizar Header
       document.getElementById('last-update').innerText = data.last_update || "N/A";
 
-      // 2. Extrair Métricas
       const zabbixHosts = data.zabbix?.hosts || [];
       const zabbixProblems = data.zabbix?.problems || [];
       const libreDevices = data.librenms?.devices || [];
       const librePorts = data.librenms?.ports || [];
 
-      // 3. Atualizar KPIs
       document.getElementById('kpi-zabbix-hosts').innerText = zabbixHosts.length;
       document.getElementById('kpi-librenms-devs').innerText = libreDevices.length;
       document.getElementById('kpi-librenms-ports').innerText = librePorts.length;
       document.getElementById('kpi-alerts').innerText = zabbixProblems.length;
 
-      // 4. Renderizar Tabela de Alertas
       const problemsTable = document.getElementById('problems-table');
       problemsTable.innerHTML = '';
       if (zabbixProblems.length === 0) {
@@ -198,11 +198,9 @@
         });
       }
 
-      // 5. Renderizar Tabela de Inventário Consolidado
       const assetsTable = document.getElementById('assets-table');
       assetsTable.innerHTML = '';
 
-      // Hosts do LibreNMS
       libreDevices.forEach(dev => {
         const row = `
           <tr class="hover:bg-slate-700/30 asset-row">
@@ -215,7 +213,6 @@
         assetsTable.innerHTML += row;
       });
 
-      // Hosts do Zabbix
       zabbixHosts.forEach(host => {
         const row = `
           <tr class="hover:bg-slate-700/30 asset-row">
@@ -228,7 +225,6 @@
         assetsTable.innerHTML += row;
       });
 
-      // 6. Atualizar Gráfico Doughnut
       renderChart(zabbixHosts.length, libreDevices.length);
     }
 
@@ -268,7 +264,6 @@
       });
     }
 
-    // Inicialização ao carregar a página
     window.onload = fetchDashboardData;
   </script>
 </body>
