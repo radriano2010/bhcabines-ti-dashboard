@@ -119,3 +119,22 @@ def main():
 
 if __name__ == "__main__":
   main()
+  import subprocess
+
+
+def push_to_github():
+  """Realiza o commit e push do arquivo JSON gerado para o GitHub."""
+  try:
+    subprocess.run(["git", "add", OUTPUT_FILE], check=True)
+    subprocess.run(
+        ["git", "commit", "-m", "auto: atualização de métricas da BH Cabines"],
+        check=True,
+    )
+    subprocess.run(["git", "push", "origin", "main"], check=True)
+    print("Métricas enviadas para o GitHub com sucesso!")
+  except Exception as e:
+    print(f"Erro ao enviar para o GitHub: {e}")
+
+
+# Adicione a chamada no final do seu main()
+# push_to_github()
