@@ -5,7 +5,7 @@ import requests
 
 # --- Configurações dos Servidores ---
 ZABBIX_URL = "http://192.168.254.80:8080/api_jsonrpc.php"
-ZABBIX_USER = "Admin"  # Substitua pelo seu usuário do Zabbix
+ZABBIX_USER = "admin_novo"  # Substitua pelo seu usuário do Zabbix
 ZABBIX_PASS = "zabbix"  # Substitua pela sua senha do Zabbix
 
 LIBRENMS_URL = "http://192.168.254.80:8000/api/v0"
