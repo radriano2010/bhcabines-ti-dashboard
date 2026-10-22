@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BH Cabines - Dashboard de Ativos T.I & Rede</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Chart.js para Gráficos -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- FontAwesome Ícones -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen font-sans flex flex-col">
+
+  <!-- Header / Navbar -->
+  <header class="bg-slate-800 border-b border-slate-700 px-6 py-4 flex flex-col md:flex-row justify-between items-center shadow-lg gap-4">
+    <div class="flex items-center gap-3">
+      <div class="bg-blue-600 p-2.5 rounded-lg text-white font-bold text-xl">
+        <i class="fa-solid fa-server"></i>
+      </div>
+      <div>
+        <h1 class="text-xl font-bold tracking-wide">BH CABINES</h1>
+        <p class="text-xs text-slate-400">Monitoramento Integrado de Ativos (Zabbix & LibreNMS)</p>
+      </div>
+    </div>
+    <div class="flex items-center gap-4 text-sm">
+      <div class="bg-slate-700/50 px-3 py-1.5 rounded-md border border-slate-600">
+        <span class="text-slate-400">Última Atualização:</span>
+        <strong id="last-update" class="text-blue-400">Carregando...</strong>
+      </div>
+      <button onclick="fetchDashboardData()" class="bg-blue-600 hover:bg-blue-500 text-white px-3 py-1.5 rounded-md text-sm transition">
+        <i class="fa-solid fa-rotate-right mr-1"></i> Atualizar
+      </button>
+    </div>
+  </header>
+
+  <!-- Conteúdo Principal -->
+  <main class="flex-1 p-6 max-w-7xl mx-auto w-full space-y-6">
+
+    <!-- KPI Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div class="bg-slate-800 border border-slate-700 p-5 rounded-xl flex items-center justify-between">
+        <div>
+          <p class="text-sm font-medium text-slate-400">Hosts Zabbix</p>
+          <h3 id="kpi-zabbix-hosts" class="text-3xl font-bold mt-1">0</h3>
+        </div>
+        <div class="p-3 bg-blue-500/10 text-blue-400 rounded-lg text-2xl">
+          <i class="fa-solid fa-network-wired"></i>
+        </div>
+      </div>
+
+      <div class="bg-slate-800 border border-slate-700 p-5 rounded-xl flex items-center justify-between">
+        <div>
+          <p class="text-sm font-medium text-slate-400">Dispositivos LibreNMS</p>
+          <h3 id="kpi-librenms-devs" class="text-3xl font-bold mt-1">0</h3>
+        </div>
+        <div class="p-3 bg-emerald-500/10 text-emerald-400 rounded-lg text-2xl">
+          <i class="fa-solid fa-router"></i>
+        </div>
+      </div>
+
+      <div class="bg-slate-800 border border-slate-700 p-5 rounded-xl flex items-center justify-between">
+        <div>
+          <p class="text-sm font-medium text-slate-400">Portas de Rede</p>
+          <h3 id="kpi-librenms-ports" class="text-3xl font-bold mt-1">0</h3>
+        </div>
+        <div class="p-3 bg-indigo-500/10 text-indigo-400 rounded-lg text-2xl">
+          <i class="fa-solid fa-ethernet"></i>
+        </div>
+      </div>
+
+      <div class="bg-slate-800 border border-slate-700 p-5 rounded-xl flex items-center justify-between">
+        <div>
+          <p class="text-sm font-medium text-slate-400">Alertas Ativos</p>
+          <h3 id="kpi-alerts" class="text-3xl font-bold mt-1 text-red-400">0</h3>
+        </div>
+        <div class="p-3 bg-red-500/10 text-red-400 rounded-lg text-2xl">
+          <i class="fa-solid fa-triangle-exclamation"></i>
+        </div>
+      </div>
+    </div>
+
+    <!-- Seção de Gráfico e Resumo de Alertas -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      
+      <!-- Gráfico de Dispositivos -->
+      <div class="bg-slate-800 border border-slate-700 p-5 rounded-xl lg:col-span-1">
+        <h2 class="text-lg font-semibold mb-4 text-slate-200">Resumo de Plataformas</h2>
+        <div class="relative h-64">
+          <canvas id="devicesChart"></canvas>
+        </div>
+      </div>
+
+      <!-- Tabela de Alertas Ativos (Zabbix) -->
+      <div class="bg-slate-800 border border-slate-700 p-5 rounded-xl lg:col-span-2">
+        <h2 class="text-lg font-semibold mb-4 text-slate-200 flex items-center gap-2">
+          <i class="fa-solid fa-circle-exclamation text-amber-400"></i> Alertas Críticos (Zabbix)
+        </h2>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-sm text-slate-300">
+            <thead class="bg-slate-700/50 text-slate-400 uppercase text-xs">
+              <tr>
+                <th class="p-3">ID Problema</th>
+                <th class="p-3">Severidade</th>
+                <th class="p-3">Descrição / Mensagem</th>
+              </tr>
+            </thead>
+            <tbody id="problems-table" class="divide-y divide-slate-700">
+              <tr>
+                <td colspan="3" class="p-4 text-center text-slate-500">Nenhum problema encontrado.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabela do Inventário de Ativos (LibreNMS & Zabbix) -->
+    <div class="bg-slate-800 border border-slate-700 p-5 rounded-xl">
+      <div class="flex flex-col md:flex-row justify-between md:items-center mb-4 gap-3">
+        <h2 class="text-lg font-semibold text-slate-200">Inventário de Dispositivos de Rede & T.I</h2>
+        <input type="text" id="search-input" onkeyup="filterAssets()" placeholder="Buscar ativo ou IP..." class="bg-slate-900 border border-slate-700 px-3 py-1.5 rounded-lg text-sm text-slate-200 focus:outline-none focus:border-blue-500 w-full md:w-64" />
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-sm text-slate-300">
+          <thead class="bg-slate-700/50 text-slate-400 uppercase text-xs">
+            <tr>
+              <th class="p-3">Nome do Ativo</th>
+              <th class="p-3">Endereço IP / Host</th>
+              <th class="p-3">Origem</th>
+              <th class="p-3">Status</th>
+            </tr>
+          </thead>
+          <tbody id="assets-table" class="divide-y divide-slate-700">
+            <!-- Preenchido via JavaScript -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
+
+  <footer class="bg-slate-800 border-t border-slate-700 py-4 text-center text-xs text-slate-500">
+    BH Cabines T.I Infrastructure Demo &copy; 2026 - Zabbix & LibreNMS Integration
+  </footer>
+
+  <!-- Lógica JavaScript -->
+  <script>
+    let chartInstance = null;
+
+    async function fetchDashboardData() {
+      try {
+        // Altere o caminho abaixo para o seu arquivo JSON publicado no repositório ou servidor local
+        const response = await fetch('./bh_cabines_assets.json');
+        if (!response.ok) throw new Error("Erro ao carregar os dados");
+        
+        const data = await response.json();
+        renderDashboard(data);
+      } catch (err) {
+        console.error("Falha ao carregar arquivo JSON:", err);
+        document.getElementById('last-update').innerText = "Erro no Carregamento";
+      }
+    }
+
+    function renderDashboard(data) {
+      // 1. Atualizar Header
+      document.getElementById('last-update').innerText = data.last_update || "N/A";
+
+      // 2. Extrair Métricas
+      const zabbixHosts = data.zabbix?.hosts || [];
+      const zabbixProblems = data.zabbix?.problems || [];
+      const libreDevices = data.librenms?.devices || [];
+      const librePorts = data.librenms?.ports || [];
+
+      // 3. Atualizar KPIs
+      document.getElementById('kpi-zabbix-hosts').innerText = zabbixHosts.length;
+      document.getElementById('kpi-librenms-devs').innerText = libreDevices.length;
+      document.getElementById('kpi-librenms-ports').innerText = librePorts.length;
+      document.getElementById('kpi-alerts').innerText = zabbixProblems.length;
+
+      // 4. Renderizar Tabela de Alertas
+      const problemsTable = document.getElementById('problems-table');
+      problemsTable.innerHTML = '';
+      if (zabbixProblems.length === 0) {
+        problemsTable.innerHTML = '<tr><td colspan="3" class="p-4 text-center text-emerald-400"><i class="fa-solid fa-check-circle mr-1"></i> Todos os sistemas operando normalmente.</td></tr>';
+      } else {
+        zabbixProblems.forEach(prob => {
+          const row = `
+            <tr class="hover:bg-slate-700/30">
+              <td class="p-3 font-mono text-xs">${prob.eventid}</td>
+              <td class="p-3"><span class="px-2 py-1 rounded text-xs bg-red-500/20 text-red-400 font-semibold">Severidade ${prob.severity}</span></td>
+              <td class="p-3">${prob.name || prob.clock}</td>
+            </tr>
+          `;
+          problemsTable.innerHTML += row;
+        });
+      }
+
+      // 5. Renderizar Tabela de Inventário Consolidado
+      const assetsTable = document.getElementById('assets-table');
+      assetsTable.innerHTML = '';
+
+      // Hosts do LibreNMS
+      libreDevices.forEach(dev => {
+        const row = `
+          <tr class="hover:bg-slate-700/30 asset-row">
+            <td class="p-3 font-medium text-slate-100">${dev.hostname}</td>
+            <td class="p-3 text-slate-400 font-mono">${dev.ip || '192.168.254.80'}</td>
+            <td class="p-3"><span class="px-2 py-0.5 rounded text-xs bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">LibreNMS</span></td>
+            <td class="p-3"><span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full ${dev.status == 1 ? 'bg-emerald-400' : 'bg-red-400'}"></span> ${dev.status == 1 ? 'Online' : 'Offline'}</span></td>
+          </tr>
+        `;
+        assetsTable.innerHTML += row;
+      });
+
+      // Hosts do Zabbix
+      zabbixHosts.forEach(host => {
+        const row = `
+          <tr class="hover:bg-slate-700/30 asset-row">
+            <td class="p-3 font-medium text-slate-100">${host.name}</td>
+            <td class="p-3 text-slate-400 font-mono">${host.host}</td>
+            <td class="p-3"><span class="px-2 py-0.5 rounded text-xs bg-blue-500/10 text-blue-400 border border-blue-500/20">Zabbix</span></td>
+            <td class="p-3"><span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full ${host.status == 0 ? 'bg-emerald-400' : 'bg-amber-400'}"></span> ${host.status == 0 ? 'Ativo' : 'Monit. Desativado'}</span></td>
+          </tr>
+        `;
+        assetsTable.innerHTML += row;
+      });
+
+      // 6. Atualizar Gráfico Doughnut
+      renderChart(zabbixHosts.length, libreDevices.length);
+    }
+
+    function renderChart(zabbixCount, libreCount) {
+      const ctx = document.getElementById('devicesChart').getContext('2d');
+      if (chartInstance) chartInstance.destroy();
+
+      chartInstance = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: ['Hosts Zabbix', 'Dispositivos LibreNMS'],
+          datasets: [{
+            data: [zabbixCount, libreCount],
+            backgroundColor: ['#3b82f6', '#10b981'],
+            borderWidth: 0
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'bottom',
+              labels: { color: '#94a3b8' }
+            }
+          }
+        }
+      });
+    }
+
+    function filterAssets() {
+      const input = document.getElementById('search-input').value.toLowerCase();
+      const rows = document.querySelectorAll('.asset-row');
+      rows.forEach(row => {
+        const text = row.innerText.toLowerCase();
+        row.style.display = text.includes(input) ? '' : 'none';
+      });
+    }
+
+    // Inicialização ao carregar a página
+    window.onload = fetchDashboardData;
+  </script>
+</body>
+</html>
