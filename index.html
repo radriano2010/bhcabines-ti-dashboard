@@ -109,7 +109,39 @@
     carregarContadores();
   </script>    
 
+<!-- Fim dos cards e blocos da dashboard -->
+  </main>
 
+  <!-- Rodapé da Página -->
+  <footer class="mt-8 py-4 text-center text-slate-500 text-sm border-t border-slate-800">
+    BH Cabines - Painel de Monitoramento Integrado &copy; 2026
+  </footer>
+
+  <!-- Script de Atualização dos Dados -->
+  <script>
+    async function carregarContadores() {
+        try {
+            const response = await fetch('bh_cabines_assets.json?t=' + new Date().getTime());
+            if (!response.ok) throw new Error('Erro ao carregar o JSON');
+            
+            const data = await response.json();
+            
+            document.getElementById('count-servers').innerText = data.servers || 0;
+            document.getElementById('count-workstations').innerText = data.workstations || 0;
+            document.getElementById('count-printers').innerText = data.printers || 0;
+            document.getElementById('count-others').innerText = data.others || 0;
+            
+            if (data.last_update) {
+                document.getElementById('last-update').innerText = data.last_update;
+            }
+        } catch (error) {
+            console.error("Erro ao carregar contadores:", error);
+        }
+    }
+    carregarContadores();
+  </script>
+</body>
+</html>
 
 
 
