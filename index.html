@@ -82,8 +82,42 @@
   </main>
 
   <script>
-    // Atualiza a hora da última atualização na tela com base no horário local
-    document.getElementById('last-update').innerText = new Date().toLocaleString('pt-BR');
+    async function carregarContadores() {
+        try {
+            // Busca o arquivo JSON gerado pelo export_metrics.py (com parâmetro anti-cache)
+            const response = await fetch('bh_cabines_assets.json?t=' + new Date().getTime());
+            if (!response.ok) throw new Error('Erro ao carregar os dados');
+            
+            const data = await response.json();
+            
+            // Preenche os contadores de dispositivos nos cards
+            document.getElementById('count-servers').innerText = data.servers || 0;
+            document.getElementById('count-workstations').innerText = data.workstations || 0;
+            document.getElementById('count-printers').innerText = data.printers || 0;
+            document.getElementById('count-others').innerText = data.others || 0;
+            
+            // Atualiza a última atualização com a data/hora vinda do script Python
+            if (data.last_update) {
+                document.getElementById('last-update').innerText = data.last_update;
+            }
+        } catch (error) {
+            console.error("Não foi possível carregar os contadores:", error);
+        }
+    }
+
+    // Executa a função assim que a página carrega
+    carregarContadores();
+  </script>    
+
+
+
+
+
+
+
+
+
+
   </script>
 </body>
 </html>
