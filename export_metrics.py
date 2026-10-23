@@ -1,188 +1,155 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>BH Cabines - Dashboard de Ativos</title>
-  <!-- Tailwind CSS -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <!-- FontAwesome Icons -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-</head>
-<body class="bg-slate-950 text-slate-100 min-h-screen p-6 flex flex-col justify-between">
+import json
+import os
+from datetime import datetime
+import requests
 
-  <main class="max-w-7xl mx-auto space-y-6 w-full">
-    
-    <!-- Cabeçalho da Dashboard com Logo -->
-    <header class="bg-slate-900 border border-slate-800 rounded-lg p-6 flex flex-col md:flex-row items-center justify-between shadow-lg gap-4">
-      <div class="flex items-center gap-4">
-        <div class="p-1 rounded-lg flex items-center justify-center">
-          <img src="logo.png" alt="BH Cabines Logo" class="h-12 w-auto object-contain">
-        </div>
-        <div>
-          <h1 class="text-xl font-bold tracking-wide">BH CABINES</h1>
-          <p class="text-xs text-slate-400">Monitoramento Integrado de Ativos (Zabbix & LibreNMS)</p>
-        </div>
-      </div>
-      
-      <div class="flex items-center gap-3">
-        <div class="bg-slate-800 px-4 py-2 rounded-md border border-slate-700 text-xs text-slate-300">
-          Última Atualização: <span id="last-update" class="font-semibold text-white">Carregando...</span>
-        </div>
-        <button onclick="location.reload()" class="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-md text-xs font-medium flex items-center gap-2 transition">
-          <i class="fa-solid fa-rotate"></i> Atualizar
-        </button>
-      </div>
-    </header>
+# --- Configurações dos Servidores ---
+ZABBIX_URL = "http://192.168.254.80:8080/api_jsonrpc.php"
+ZABBIX_USER = "admin_novo"
+ZABBIX_PASS = "zabbix"
 
-    <!-- Grid de Cards de Resumo de Dispositivos -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-      
-      <!-- Card Servidores -->
-      <div class="bg-slate-900 border border-slate-800 rounded-lg p-5 flex items-center justify-between shadow-md">
-        <div>
-          <p class="text-slate-400 text-xs uppercase tracking-wider font-medium">Servidores</p>
-          <h4 id="count-servers" class="text-3xl font-bold text-white mt-1">0</h4>
-        </div>
-        <div class="p-3 bg-blue-500/10 text-blue-400 rounded-lg border border-blue-500/20">
-          <i class="fa-solid fa-server text-xl"></i>
-        </div>
-      </div>
+LIBRENMS_URL = "http://192.168.254.80:8000/api/v0"
+LIBRENMS_TOKEN = "187c6bb55546da8ca383996ef98ca5ac"
 
-      <!-- Card Estações de Trabalho -->
-      <div class="bg-slate-900 border border-slate-800 rounded-lg p-5 flex items-center justify-between shadow-md">
-        <div>
-          <p class="text-slate-400 text-xs uppercase tracking-wider font-medium">Estações de Trabalho</p>
-          <h4 id="count-workstations" class="text-3xl font-bold text-white mt-1">0</h4>
-        </div>
-        <div class="p-3 bg-green-500/10 text-green-400 rounded-lg border border-green-500/20">
-          <i class="fa-solid fa-desktop text-xl"></i>
-        </div>
-      </div>
+OUTPUT_FILE = "bh_cabines_assets.json"
 
-      <!-- Card Impressoras -->
-      <div class="bg-slate-900 border border-slate-800 rounded-lg p-5 flex items-center justify-between shadow-md">
-        <div>
-          <p class="text-slate-400 text-xs uppercase tracking-wider font-medium">Impressoras</p>
-          <h4 id="count-printers" class="text-3xl font-bold text-white mt-1">0</h4>
-        </div>
-        <div class="p-3 bg-yellow-500/10 text-yellow-400 rounded-lg border border-yellow-500/20">
-          <i class="fa-solid fa-print text-xl"></i>
-        </div>
-      </div>
 
-      <!-- Card Outros Dispositivos -->
-      <div class="bg-slate-900 border border-slate-800 rounded-lg p-5 flex items-center justify-between shadow-md">
-        <div>
-          <p class="text-slate-400 text-xs uppercase tracking-wider font-medium">Outros Dispositivos</p>
-          <h4 id="count-others" class="text-3xl font-bold text-white mt-1">0</h4>
-        </div>
-        <div class="p-3 bg-purple-500/10 text-purple-400 rounded-lg border border-purple-500/20">
-          <i class="fa-solid fa-network-wired text-xl"></i>
-        </div>
-      </div>
-
-    </div>
-
-    <!-- Listagens Detalhadas de Nomes e IPs por Categoria -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-6">
-      
-      <!-- Lista Servidores Detalhados -->
-      <div class="bg-slate-900 border border-slate-800 rounded-lg p-4 shadow-md flex flex-col h-80">
-        <h3 class="text-xs font-bold text-blue-400 uppercase tracking-wider mb-3 pb-2 border-b border-slate-800 flex items-center gap-2">
-          <i class="fa-solid fa-server"></i> Servidores (Nome / IP)
-        </h3>
-        <div id="list-servers" class="overflow-y-auto space-y-2 pr-1 text-xs flex-1 divide-y divide-slate-800/60">
-          <p class="text-slate-500 italic">Carregando...</p>
-        </div>
-      </div>
-
-      <!-- Lista Estações Detalhadas -->
-      <div class="bg-slate-900 border border-slate-800 rounded-lg p-4 shadow-md flex flex-col h-80">
-        <h3 class="text-xs font-bold text-green-400 uppercase tracking-wider mb-3 pb-2 border-b border-slate-800 flex items-center gap-2">
-          <i class="fa-solid fa-desktop"></i> Estações (Nome / IP)
-        </h3>
-        <div id="list-workstations" class="overflow-y-auto space-y-2 pr-1 text-xs flex-1 divide-y divide-slate-800/60">
-          <p class="text-slate-500 italic">Carregando...</p>
-        </div>
-      </div>
-
-      <!-- Lista Impressoras Detalhadas -->
-      <div class="bg-slate-900 border border-slate-800 rounded-lg p-4 shadow-md flex flex-col h-80">
-        <h3 class="text-xs font-bold text-yellow-400 uppercase tracking-wider mb-3 pb-2 border-b border-slate-800 flex items-center gap-2">
-          <i class="fa-solid fa-print"></i> Impressoras (Nome / IP)
-        </h3>
-        <div id="list-printers" class="overflow-y-auto space-y-2 pr-1 text-xs flex-1 divide-y divide-slate-800/60">
-          <p class="text-slate-500 italic">Carregando...</p>
-        </div>
-      </div>
-
-      <!-- Lista Outros Detalhados -->
-      <div class="bg-slate-900 border border-slate-800 rounded-lg p-4 shadow-md flex flex-col h-80">
-        <h3 class="text-xs font-bold text-purple-400 uppercase tracking-wider mb-3 pb-2 border-b border-slate-800 flex items-center gap-2">
-          <i class="fa-solid fa-network-wired"></i> Outros (Nome / IP)
-        </h3>
-        <div id="list-others" class="overflow-y-auto space-y-2 pr-1 text-xs flex-1 divide-y divide-slate-800/60">
-          <p class="text-slate-500 italic">Carregando...</p>
-        </div>
-      </div>
-
-    </div>
-
-  </main>
-
-  <!-- Rodapé Unificado com Créditos -->
-  <footer class="mt-12 py-6 text-center text-slate-300 text-xs border-t border-slate-800 w-full bg-slate-950">
-    <p>BH Cabines - Painel de Monitoramento Integrado &copy; 2026 | Desenvolvido por <strong class="text-white underline">Ricardo Adriano Silva</strong></p>
-  </footer>
-
-  <!-- Script de Leitura e Preenchimento Dinâmico -->
-  <script>
-    function preencherLista(elementId, items) {
-        const container = document.getElementById(elementId);
-        container.innerHTML = '';
-        if (!items || items.length === 0) {
-            container.innerHTML = '<p class="text-slate-500 italic py-2">Nenhum dispositivo.</p>';
-            return;
+def get_zabbix_data():
+    """Autentica na API do Zabbix e busca hosts e problemas ativos."""
+    data_summary = {"status": "error", "hosts": [], "problems": []}
+    try:
+        auth_payload = {
+            "jsonrpc": "2.0",
+            "method": "user.login",
+            "params": {"username": ZABBIX_USER, "password": ZABBIX_PASS},
+            "id": 1,
         }
-        items.forEach(item => {
-            const div = document.createElement('div');
-            div.className = 'py-2 flex flex-col justify-between';
-            div.innerHTML = `
-              <span class="font-semibold text-slate-200 truncate" title="${item.name}">${item.name}</span>
-              <span class="text-slate-400 font-mono text-[11px]"><i class="fa-solid fa-network-wired text-[10px] mr-1 text-slate-500"></i>${item.ip}</span>
-            `;
-            container.appendChild(div);
-        });
+        response = requests.post(ZABBIX_URL, json=auth_payload, timeout=10)
+        result = response.json()
+
+        if "result" not in result:
+            print("Erro na autenticação do Zabbix.")
+            return data_summary
+
+        auth_token = result["result"]
+
+        hosts_payload = {
+            "jsonrpc": "2.0",
+            "method": "host.get",
+            "params": {"output": ["hostid", "host", "name", "status"]},
+            "auth": auth_token,
+            "id": 2,
+        }
+        hosts_res = requests.post(ZABBIX_URL, json=hosts_payload, timeout=10).json()
+        
+        if "result" in hosts_res:
+            data_summary["hosts"] = hosts_res["result"]
+
+        data_summary["status"] = "success"
+    except Exception as e:
+        print(f"Erro ao conectar com Zabbix: {e}")
+
+    return data_summary
+
+
+def get_librenms_data():
+    """Busca dispositivos na API do LibreNMS, categoriza e extrai nome e IP."""
+    devices_summary = {
+        "status": "error", 
+        "devices": [], 
+        "servers": 0, 
+        "workstations": 0, 
+        "printers": 0, 
+        "others": 0,
+        "server_list": [],
+        "workstation_list": [],
+        "printer_list": [],
+        "other_list": []
+    }
+    try:
+        headers = {"X-Auth-Token": LIBRENMS_TOKEN}
+        response = requests.get(f"{LIBRENMS_URL}/devices", headers=headers, timeout=10)
+        
+        if response.status_code == 200:
+            result = response.json()
+            devices = result.get("devices", [])
+            devices_summary["devices"] = devices
+            
+            servers_count = 0
+            workstations_count = 0
+            printers_count = 0
+            others_count = 0
+
+            server_list = []
+            workstation_list = []
+            printer_list = []
+            other_list = []
+
+            for device in devices:
+                tipo = str(device.get("type", "")).lower()
+                hardware = str(device.get("hardware", "")).lower()
+                os_name = str(device.get("os", "")).lower()
+                hostname = device.get("hostname", "Desconhecido")
+                ip_addr = device.get("ip", "IP não retornado")
+
+                device_info = {"name": hostname, "ip": ip_addr}
+
+                if "server" in tipo or "linux" in os_name or "windows server" in hardware or "server" in hardware:
+                    servers_count += 1
+                    server_list.append(device_info)
+                elif "workstation" in tipo or "desktop" in os_name or "client" in hardware or "pc" in hardware:
+                    workstations_count += 1
+                    workstation_list.append(device_info)
+                elif "printer" in tipo or "laserjet" in hardware or "mfc" in hardware or "print" in hardware:
+                    printers_count += 1
+                    printer_list.append(device_info)
+                else:
+                    others_count += 1
+                    other_list.append(device_info)
+
+            devices_summary["servers"] = servers_count
+            devices_summary["workstations"] = workstations_count
+            devices_summary["printers"] = printers_count
+            devices_summary["others"] = others_count
+            
+            devices_summary["server_list"] = server_list
+            devices_summary["workstation_list"] = workstation_list
+            devices_summary["printer_list"] = printer_list
+            devices_summary["other_list"] = other_list
+            devices_summary["status"] = "success"
+        else:
+            print(f"Erro na API do LibreNMS: Código {response.status_code}")
+    except Exception as e:
+        print(f"Erro ao conectar com LibreNMS: {e}")
+
+    return devices_summary
+
+
+def main():
+    print("Coletando dados do Zabbix e LibreNMS...")
+    zabbix_data = get_zabbix_data()
+    librenms_data = get_librenms_data()
+
+    dashboard_payload = {
+        "last_update": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "zabbix": zabbix_data,
+        "librenms": librenms_data,
+        "servers": librenms_data.get("servers", 0),
+        "workstations": librenms_data.get("workstations", 0),
+        "printers": librenms_data.get("printers", 0),
+        "others": librenms_data.get("others", 0),
+        "server_list": librenms_data.get("server_list", []),
+        "workstation_list": librenms_data.get("workstation_list", []),
+        "printer_list": librenms_data.get("printer_list", []),
+        "other_list": librenms_data.get("other_list", []),
     }
 
-    async function carregarContadores() {
-        try {
-            const response = await fetch('bh_cabines_assets.json?t=' + new Date().getTime());
-            if (!response.ok) throw new Error('Erro ao carregar o ficheiro JSON');
-            
-            const data = await response.json();
-            
-            document.getElementById('count-servers').innerText = data.servers || 0;
-            document.getElementById('count-workstations').innerText = data.workstations || 0;
-            document.getElementById('count-printers').innerText = data.printers || 0;
-            document.getElementById('count-others').innerText = data.others || 0;
-            
-            preencherLista('list-servers', data.server_list);
-            preencherLista('list-workstations', data.workstation_list);
-            preencherLista('list-printers', data.printer_list);
-            preencherLista('list-others', data.other_list);
-            
-            if (data.last_update) {
-                document.getElementById('last-update').innerText = data.last_update;
-            }
-        } catch (error) {
-            console.error("Não foi possível carregar os dados:", error);
-        }
-    }
+    with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
+        json.dump(dashboard_payload, f, indent=4, ensure_ascii=False)
 
-    carregarContadores();
-  </script>
-</body>
-</html>
+    print(f"Dados salvos com sucesso em {OUTPUT_FILE}")
+
+
+if __name__ == "__main__":
+    main()
 
