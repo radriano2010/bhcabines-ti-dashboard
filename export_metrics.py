@@ -89,8 +89,18 @@ def get_librenms_data():
                 tipo = str(device.get("type", "")).lower()
                 hardware = str(device.get("hardware", "")).lower()
                 os_name = str(device.get("os", "")).lower()
-                hostname = device.get("hostname", "Desconhecido")
                 ip_addr = device.get("ip", "IP não retornado")
+                
+                # Pega o display, hostname ou sysName do LibreNMS
+                hostname = device.get("display") or device.get("hostname") or device.get("sysName") or "Desconhecido"
+
+                # Se o hostname retornado for igual ao IP, usa o sysName ou cria um rótulo limpo
+                if hostname == ip_addr or not hostname:
+                    sysname = device.get("sysName")
+                    if sysname and sysname != ip_addr:
+                        hostname = sysname
+                    else:
+                        hostname = f"Dispositivo ({ip_addr})"
 
                 device_info = {"name": hostname, "ip": ip_addr}
 
