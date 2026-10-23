@@ -29,7 +29,7 @@
         <div class="bg-slate-800 px-4 py-2 rounded-md border border-slate-700 text-xs text-slate-300">
           Última Atualização: <span id="last-update" class="font-semibold text-white">Carregando...</span>
         </div>
-        <button onclick="solicitarSenhaAtualizacao()" class="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-md text-xs font-medium flex items-center gap-2 transition">
+        <button onclick="solicitarSenhaAtualizacao()" class="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-md text-xs font-medium flex items-center gap-2 transition cursor-pointer">
           <i class="fa-solid fa-rotate"></i> Atualizar
         </button>
       </div>
@@ -150,6 +150,7 @@
 
     function preencherLista(elementId, items) {
         const container = document.getElementById(elementId);
+        if (!container) return;
         container.innerHTML = '';
         if (!items || items.length === 0) {
             container.innerHTML = '<p class="text-slate-500 italic py-2">Nenhum dispositivo.</p>';
@@ -195,3 +196,4 @@
   </script>
 </body>
 </html>
+
