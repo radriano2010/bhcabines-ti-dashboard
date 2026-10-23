@@ -88,41 +88,41 @@
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-6">
       
       <!-- Lista Servidores Detalhados -->
-      <div class="bg-slate-900 border border-slate-800 rounded-lg p-4 shadow-md flex flex-col h-80">
-        <h3 class="text-xs font-bold text-blue-400 uppercase tracking-wider mb-3 pb-2 border-b border-slate-800 flex items-center gap-2">
-          <i class="fa-solid fa-server"></i> Servidores (Nome / IP)
+      <div class="bg-slate-900 border border-slate-800 rounded-lg p-4 shadow-md">
+        <h3 class="text-xs font-bold text-blue-400 uppercase tracking-wider mb-3 pb-2 border-b border-slate-800">
+          <i class="fa-solid fa-server mr-1"></i> Servidores (Nome / IP)
         </h3>
-        <div id="list-servers" class="overflow-y-auto space-y-2 pr-1 text-xs flex-1 divide-y divide-slate-800/60">
+        <div id="list-servers" class="space-y-2 text-xs">
           <p class="text-slate-500 italic">Carregando...</p>
         </div>
       </div>
 
       <!-- Lista Estações Detalhadas -->
-      <div class="bg-slate-900 border border-slate-800 rounded-lg p-4 shadow-md flex flex-col h-80">
-        <h3 class="text-xs font-bold text-green-400 uppercase tracking-wider mb-3 pb-2 border-b border-slate-800 flex items-center gap-2">
-          <i class="fa-solid fa-desktop"></i> Estações (Nome / IP)
+      <div class="bg-slate-900 border border-slate-800 rounded-lg p-4 shadow-md">
+        <h3 class="text-xs font-bold text-green-400 uppercase tracking-wider mb-3 pb-2 border-b border-slate-800">
+          <i class="fa-solid fa-desktop mr-1"></i> Estações (Nome / IP)
         </h3>
-        <div id="list-workstations" class="overflow-y-auto space-y-2 pr-1 text-xs flex-1 divide-y divide-slate-800/60">
+        <div id="list-workstations" class="space-y-2 text-xs">
           <p class="text-slate-500 italic">Carregando...</p>
         </div>
       </div>
 
       <!-- Lista Impressoras Detalhadas -->
-      <div class="bg-slate-900 border border-slate-800 rounded-lg p-4 shadow-md flex flex-col h-80">
-        <h3 class="text-xs font-bold text-yellow-400 uppercase tracking-wider mb-3 pb-2 border-b border-slate-800 flex items-center gap-2">
-          <i class="fa-solid fa-print"></i> Impressoras (Nome / IP)
+      <div class="bg-slate-900 border border-slate-800 rounded-lg p-4 shadow-md">
+        <h3 class="text-xs font-bold text-yellow-400 uppercase tracking-wider mb-3 pb-2 border-b border-slate-800">
+          <i class="fa-solid fa-print mr-1"></i> Impressoras (Nome / IP)
         </h3>
-        <div id="list-printers" class="overflow-y-auto space-y-2 pr-1 text-xs flex-1 divide-y divide-slate-800/60">
+        <div id="list-printers" class="space-y-2 text-xs">
           <p class="text-slate-500 italic">Carregando...</p>
         </div>
       </div>
 
       <!-- Lista Outros Detalhados -->
-      <div class="bg-slate-900 border border-slate-800 rounded-lg p-4 shadow-md flex flex-col h-80">
-        <h3 class="text-xs font-bold text-purple-400 uppercase tracking-wider mb-3 pb-2 border-b border-slate-800 flex items-center gap-2">
-          <i class="fa-solid fa-network-wired"></i> Outros (Nome / IP)
+      <div class="bg-slate-900 border border-slate-800 rounded-lg p-4 shadow-md">
+        <h3 class="text-xs font-bold text-purple-400 uppercase tracking-wider mb-3 pb-2 border-b border-slate-800">
+          <i class="fa-solid fa-network-wired mr-1"></i> Outros (Nome / IP)
         </h3>
-        <div id="list-others" class="overflow-y-auto space-y-2 pr-1 text-xs flex-1 divide-y divide-slate-800/60">
+        <div id="list-others" class="space-y-2 text-xs">
           <p class="text-slate-500 italic">Carregando...</p>
         </div>
       </div>
@@ -142,12 +142,12 @@
         const container = document.getElementById(elementId);
         container.innerHTML = '';
         if (!items || items.length === 0) {
-            container.innerHTML = '<p class="text-slate-500 italic py-2">Nenhum dispositivo.</p>';
+            container.innerHTML = '<p class="text-slate-500 italic py-1">Nenhum dispositivo.</p>';
             return;
         }
         items.forEach(item => {
             const div = document.createElement('div');
-            div.className = 'py-2 flex flex-col justify-between';
+            div.className = 'py-1 border-b border-slate-800/40 last:border-0 flex flex-col';
             div.innerHTML = `
               <span class="font-semibold text-slate-200 truncate" title="${item.name}">${item.name}</span>
               <span class="text-slate-400 font-mono text-[11px]"><i class="fa-solid fa-network-wired text-[10px] mr-1 text-slate-500"></i>${item.ip}</span>
