@@ -86,10 +86,10 @@
 
   </main>
 
-  <!-- Rodapé da Página com Desenvolvedor -->
-  <footer class="mt-12 py-6 text-center text-slate-500 text-xs border-t border-slate-900 space-y-1 w-full">
+  <!-- Rodapé da Página com Créditos -->
+  <footer class="mt-12 py-6 text-center text-slate-400 text-xs border-t border-slate-900 space-y-1 w-full bg-slate-950">
     <p>BH Cabines - Painel de Monitoramento Integrado &copy; 2026</p>
-    <p class="text-slate-400 font-medium">Desenvolvido por <span class="text-slate-200">Ricardo Adriano Silva</span></p>
+    <p class="text-slate-300 font-medium">Desenvolvido por <span class="text-blue-400 font-semibold">Ricardo Adriano Silva</span></p>
   </footer>
 
   <!-- Script de Leitura do JSON -->
@@ -97,7 +97,7 @@
     async function carregarContadores() {
         try {
             const response = await fetch('bh_cabines_assets.json?t=' + new Date().getTime());
-            if (!response.ok) throw new Error('Erro ao carregar o ficheiro JSON');
+            if (!response.ok) throw new Error('Erro ao carregar o arquivo JSON');
             
             const data = await response.json();
             
@@ -118,3 +118,4 @@
   </script>
 </body>
 </html>
+
