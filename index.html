@@ -9,9 +9,9 @@
   <!-- FontAwesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen p-6">
+<body class="bg-slate-950 text-slate-100 min-h-screen p-6 flex flex-col justify-between">
 
-  <main class="max-w-7xl mx-auto space-y-6">
+  <main class="max-w-7xl mx-auto space-y-6 w-full">
     
     <!-- Cabeçalho da Dashboard -->
     <header class="bg-slate-900 border border-slate-800 rounded-lg p-6 flex flex-col md:flex-row items-center justify-between shadow-lg gap-4">
@@ -86,9 +86,10 @@
 
   </main>
 
-  <!-- Rodapé da Página -->
-  <footer class="mt-12 py-6 text-center text-slate-500 text-xs border-t border-slate-900">
-    BH Cabines - Painel de Monitoramento Integrado &copy; 2026
+  <!-- Rodapé da Página com Desenvolvedor -->
+  <footer class="mt-12 py-6 text-center text-slate-500 text-xs border-t border-slate-900 space-y-1 w-full">
+    <p>BH Cabines - Painel de Monitoramento Integrado &copy; 2026</p>
+    <p class="text-slate-400 font-medium">Desenvolvido por <span class="text-slate-200">Ricardo Adriano Silva</span></p>
   </footer>
 
   <!-- Script de Leitura do JSON -->
@@ -96,7 +97,7 @@
     async function carregarContadores() {
         try {
             const response = await fetch('bh_cabines_assets.json?t=' + new Date().getTime());
-            if (!response.ok) throw new Error('Erro ao carregar o arquivo JSON');
+            if (!response.ok) throw new Error('Erro ao carregar o ficheiro JSON');
             
             const data = await response.json();
             
