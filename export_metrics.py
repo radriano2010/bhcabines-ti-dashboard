@@ -1,7 +1,6 @@
 import json
 import os
 from datetime import datetime, timedelta
-from zoneinfo import ZoneInfo
 import requests
 
 # --- Configurações dos Servidores ---
@@ -16,7 +15,6 @@ OUTPUT_FILE = "bh_cabines_assets.json"
 
 
 def get_zabbix_data():
-    """Autentica na API do Zabbix e busca hosts."""
     data_summary = {"status": "error", "hosts": [], "problems": []}
     try:
         auth_payload = {
@@ -29,7 +27,6 @@ def get_zabbix_data():
         result = response.json()
 
         if "result" not in result:
-            print("Erro na autenticação do Zabbix.")
             return data_summary
 
         auth_token = result["result"]
@@ -51,13 +48,12 @@ def get_zabbix_data():
 
         data_summary["status"] = "success"
     except Exception as e:
-        print(f"Erro ao conectar com Zabbix: {e}")
+        print(f"Erro Zabbix: {e}")
 
     return data_summary
 
 
 def get_librenms_data():
-    """Busca dispositivos na API do LibreNMS."""
     devices_summary = {"status": "error", "devices": []}
     try:
         headers = {"X-Auth-Token": LIBRENMS_TOKEN}
@@ -67,16 +63,13 @@ def get_librenms_data():
             result = response.json()
             devices_summary["devices"] = result.get("devices", [])
             devices_summary["status"] = "success"
-        else:
-            print(f"Erro na API do LibreNMS: Código {response.status_code}")
     except Exception as e:
-        print(f"Erro ao conectar com LibreNMS: {e}")
+        print(f"Erro LibreNMS: {e}")
 
     return devices_summary
 
 
 def classify_and_add(name, ip, tipo, hardware, os_name, server_list, workstation_list, printer_list, network_list, other_list):
-    """Classifica o dispositivo nas respetivas categorias."""
     name_lower = str(name).lower()
     tipo_lower = str(tipo).lower()
     hardware_lower = str(hardware).lower()
@@ -84,20 +77,20 @@ def classify_and_add(name, ip, tipo, hardware, os_name, server_list, workstation
 
     device_info = {"name": name, "ip": ip}
 
-    if "server" in tipo_lower or "linux" in os_lower or "windows server" in hardware_lower or "server" in hardware_lower or "srv" in name_lower or "db" in name_lower:
+    if any(k in name_lower or k in tipo_lower or k in hardware_lower or k in os_lower for k in ["server", "srv", "db", "ubuntu", "guardian"]):
         server_list.append(device_info)
-    elif "workstation" in tipo_lower or "desktop" in os_lower or "client" in hardware_lower or "pc" in hardware_lower or "desktop" in name_lower:
+    elif any(k in name_lower or k in tipo_lower or k in hardware_lower or k in os_lower for k in ["workstation", "desktop", "pc", "client"]):
         workstation_list.append(device_info)
-    elif "printer" in tipo_lower or "laserjet" in hardware_lower or "mfc" in hardware_lower or "print" in hardware_lower or "printer" in name_lower:
+    elif any(k in name_lower or k in tipo_lower or k in hardware_lower for k in ["printer", "laserjet", "mfc", "print", "epson", "brother"]):
         printer_list.append(device_info)
-    elif "switch" in tipo_lower or "router" in tipo_lower or "firewall" in tipo_lower or "network" in tipo_lower or "gateway" in hardware_lower or "router" in hardware_lower or "switch" in hardware_lower or "net" in name_lower:
+    elif any(k in name_lower or k in tipo_lower or k in hardware_lower for k in ["switch", "router", "firewall", "gateway", "net"]):
         network_list.append(device_info)
     else:
         other_list.append(device_info)
 
 
 def main():
-    print("Coletando dados do Zabbix e LibreNMS...")
+    print("Coletando dados...")
     zabbix_data = get_zabbix_data()
     librenms_data = get_librenms_data()
 
@@ -126,9 +119,11 @@ def main():
         
         classify_and_add(name, ip_addr, "", "", "", server_list, workstation_list, printer_list, network_list, other_list)
 
+    # Hora corrigida de Brasília (UTC - 3 horas)
+    horario_brasilia = datetime.utcnow() - timedelta(hours=3)
+
     dashboard_payload = {
-        dashboard_payload = {
-        "last_update": (datetime.utcnow() - timedelta(hours=3)).strftime("%Y-%m-%d %H:%M:%S"),
+        "last_update": horario_brasilia.strftime("%Y-%m-%d %H:%M:%S"),
         "zabbix": zabbix_data,
         "librenms": librenms_data,
         "servers": len(server_list),
@@ -146,8 +141,9 @@ def main():
     with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
         json.dump(dashboard_payload, f, indent=4, ensure_ascii=False)
 
-    print(f"Dados consolidados salvos com sucesso em {OUTPUT_FILE}")
+    print("Concluído com sucesso!")
 
 
 if __name__ == "__main__":
     main()
+
