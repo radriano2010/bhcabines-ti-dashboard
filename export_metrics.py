@@ -15,7 +15,7 @@ OUTPUT_FILE = "bh_cabines_assets.json"
 
 
 def get_zabbix_data():
-    """Autentica na API do Zabbix e busca hosts e problemas ativos."""
+    """Autentica na API do Zabbix e busca hosts."""
     data_summary = {"status": "error", "hosts": [], "problems": []}
     try:
         auth_payload = {
@@ -74,8 +74,8 @@ def get_librenms_data():
     return devices_summary
 
 
-def classify_and_add(name, ip, tipo, hardware, os_name, server_list, workstation_list, printer_list, other_list):
-    """Função auxiliar para classificar qualquer dispositivo unificado."""
+def classify_and_add(name, ip, tipo, hardware, os_name, server_list, workstation_list, printer_list, network_list, other_list):
+    """Classifica o dispositivo nas respetivas categorias."""
     name_lower = str(name).lower()
     tipo_lower = str(tipo).lower()
     hardware_lower = str(hardware).lower()
@@ -89,6 +89,8 @@ def classify_and_add(name, ip, tipo, hardware, os_name, server_list, workstation
         workstation_list.append(device_info)
     elif "printer" in tipo_lower or "laserjet" in hardware_lower or "mfc" in hardware_lower or "print" in hardware_lower or "printer" in name_lower:
         printer_list.append(device_info)
+    elif "switch" in tipo_lower or "router" in tipo_lower or "firewall" in tipo_lower or "network" in tipo_lower or "gateway" in hardware_lower or "router" in hardware_lower or "switch" in hardware_lower or "net" in name_lower:
+        network_list.append(device_info)
     else:
         other_list.append(device_info)
 
@@ -101,9 +103,9 @@ def main():
     server_list = []
     workstation_list = []
     printer_list = []
+    network_list = []
     other_list = []
 
-    # 1. Processar e classificar dispositivos do LibreNMS
     for device in librenms_data.get("devices", []):
         ip_addr = device.get("ip", "IP não retornado")
         hostname = device.get("display") or device.get("hostname") or device.get("sysName")
@@ -114,16 +116,14 @@ def main():
         hardware = device.get("hardware", "")
         os_name = device.get("os", "")
 
-        classify_and_add(hostname, ip_addr, tipo, hardware, os_name, server_list, workstation_list, printer_list, other_list)
+        classify_and_add(hostname, ip_addr, tipo, hardware, os_name, server_list, workstation_list, printer_list, network_list, other_list)
 
-    # 2. Processar e classificar hosts do Zabbix para unificar no painel
     for host in zabbix_data.get("hosts", []):
         name = host.get("name") or host.get("host", "Desconhecido")
         interfaces = host.get("interfaces", [])
         ip_addr = interfaces[0].get("ip") if interfaces else "IP não retornado"
         
-        # O Zabbix entra na classificação por nome ou padrão
-        classify_and_add(name, ip_addr, "", "", "", server_list, workstation_list, printer_list, other_list)
+        classify_and_add(name, ip_addr, "", "", "", server_list, workstation_list, printer_list, network_list, other_list)
 
     dashboard_payload = {
         "last_update": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
@@ -132,10 +132,12 @@ def main():
         "servers": len(server_list),
         "workstations": len(workstation_list),
         "printers": len(printer_list),
+        "networks": len(network_list),
         "others": len(other_list),
         "server_list": server_list,
         "workstation_list": workstation_list,
         "printer_list": printer_list,
+        "network_list": network_list,
         "other_list": other_list,
     }
 
