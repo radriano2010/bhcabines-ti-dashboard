@@ -1,21 +1,20 @@
 {
-  "last_update": "26/10/2026 18:15:01",
-  "servers": 1,
+  "last_update": "26/10/2026 18:18:07",
+  "servers": 0,
   "workstations": 0,
   "printers": 0,
-  "others": 77,
-  "server_list": [
-    {
-      "name": "192.168.254.10",
-      "ip": "���\\n"
-    }
-  ],
+  "others": 78,
+  "server_list": [],
   "workstation_list": [],
   "printer_list": [],
   "other_list": [
     {
       "name": "172.17.0.1",
       "ip": "�\u0011\\0\u0001"
+    },
+    {
+      "name": "192.168.254.10",
+      "ip": "���\\n"
     },
     {
       "name": "192.168.254.11",
