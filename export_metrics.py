@@ -126,7 +126,8 @@ def main():
         classify_and_add(name, ip_addr, "", "", "", server_list, workstation_list, printer_list, network_list, other_list)
 
     dashboard_payload = {
-        "last_update": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        dashboard_payload = {
+        "last_update": (datetime.utcnow() - timedelta(hours=3)).strftime("%Y-%m-%d %H:%M:%S"),
         "zabbix": zabbix_data,
         "librenms": librenms_data,
         "servers": len(server_list),
