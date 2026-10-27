@@ -150,7 +150,45 @@ def main():
         json.dump(dashboard_payload, f, indent=4, ensure_ascii=False)
 
     print("Concluído com sucesso!")
+def classify_and_add(name, ip, tipo, hardware, os_name, server_list, workstation_list, printer_list, network_list, other_list):
+    name_lower = str(name).lower() if name else ""
+    tipo_lower = str(tipo).lower() if tipo else ""
+    hardware_lower = str(hardware).lower() if hardware else ""
+    os_lower = str(os_name).lower() if os_name else ""
+    ip_str = str(ip) if ip else ""
 
+    device_info = {"name": name, "ip": ip}
+
+    # Palavras-chave textuais
+    server_keys = ["server", "srv", "db", "database", "ubuntu", "debian", "centos", "windows server", "vm", "virtual", "guardian"]
+    workstation_keys = ["workstation", "desktop", "pc", "client", "notebook", "laptop", "usuario"]
+    printer_keys = ["printer", "laserjet", "mfc", "print", "epson", "brother", "hp", "xerox"]
+    network_keys = ["switch", "router", "firewall", "gateway", "net", "ap", "access point", "roteador", "hub", "routerer106"]
+
+    # 1. Classificação por texto (nome, tipo, hardware, OS)
+    if any(k in name_lower or k in tipo_lower or k in hardware_lower or k in os_lower for k in server_keys):
+        server_list.append(device_info)
+    elif any(k in name_lower or k in tipo_lower or k in hardware_lower or k in os_lower for k in workstation_keys):
+        workstation_list.append(device_info)
+    elif any(k in name_lower or k in tipo_lower or k in hardware_lower for k in printer_keys):
+        printer_list.append(device_info)
+    elif any(k in name_lower or k in tipo_lower or k in hardware_lower for k in network_keys):
+        network_list.append(device_info)
+    
+    # 2. Classificação por faixa de IP (Caso venham sem nome descritivo)
+    # Ajuste estas regras conforme a distribuição real dos seus equipamentos na rede:
+    elif ip_str.startswith("192.168.254."):
+        # Exemplo: Se os IPs de .10 a .20 forem estações ou rede, defina aqui. 
+        # Por exemplo, se forem dispositivos de rede/switches:
+        network_list.append(device_info)
+        
+        # Ou se preferir dividir por final de IP, por exemplo:
+        # if int(ip_str.split('.')[-1]) < 20:
+        #     network_list.append(device_info)
+        # else:
+        #     workstation_list.append(device_info)
+    else:
+        other_list.append(device_info)
 
 if __name__ == "__main__":
     main()
