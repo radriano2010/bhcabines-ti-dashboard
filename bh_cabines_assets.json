@@ -1,13 +1,329 @@
 {
-    "servers": 0,
-    "workstations": 0,
-    "printers": 0,
-    "networks": 0,
+    "servers": 36,
+    "workstations": 33,
+    "printers": 8,
+    "networks": 1,
     "others": 0,
-    "server_list": [],
-    "workstation_list": [],
-    "printer_list": [],
-    "network_list": [],
+    "server_list": [
+        {
+            "name": "Server Guardian",
+            "ip": "192.168.254.10"
+        },
+        {
+            "name": "Server4",
+            "ip": "192.168.254.11"
+        },
+        {
+            "name": "Print Server",
+            "ip": "192.168.254.13"
+        },
+        {
+            "name": "DB server",
+            "ip": "192.168.254.15"
+        },
+        {
+            "name": "Suporte - Garantia/Vendas",
+            "ip": "192.168.254.189"
+        },
+        {
+            "name": "File Server",
+            "ip": "192.168.254.34"
+        },
+        {
+            "name": "adm36",
+            "ip": "192.168.254.44"
+        },
+        {
+            "name": "Maria Thereza",
+            "ip": "192.168.254.112"
+        },
+        {
+            "name": "LORRAN",
+            "ip": "192.168.254.201"
+        },
+        {
+            "name": "WEVERTON",
+            "ip": "192.168.254.229"
+        },
+        {
+            "name": "Hudson",
+            "ip": "192.168.254.115"
+        },
+        {
+            "name": "adm21",
+            "ip": "192.168.254.101"
+        },
+        {
+            "name": "Kiko - Expediçao",
+            "ip": "192.168.254.170"
+        },
+        {
+            "name": "Newrian",
+            "ip": "192.168.254.81"
+        },
+        {
+            "name": "Rafael",
+            "ip": "192.168.254.152"
+        },
+        {
+            "name": "ESTEVAO",
+            "ip": "192.168.254.218"
+        },
+        {
+            "name": "RHYAN",
+            "ip": "192.168.254.172"
+        },
+        {
+            "name": "GABRIELLA",
+            "ip": "192.168.254.44"
+        },
+        {
+            "name": "separação fundo",
+            "ip": "192.168.254.188"
+        },
+        {
+            "name": "FRANCES",
+            "ip": "192.168.254.166"
+        },
+        {
+            "name": "ROBERT",
+            "ip": "192.168.254.238"
+        },
+        {
+            "name": "Viciane 02",
+            "ip": "192.168.254.133"
+        },
+        {
+            "name": "Viviane 01",
+            "ip": "192.168.254.73"
+        },
+        {
+            "name": "GLAYSSON",
+            "ip": "192.168.254.117"
+        },
+        {
+            "name": "Leandro",
+            "ip": "192.168.254.212"
+        },
+        {
+            "name": "IAGO",
+            "ip": "192.168.254.230"
+        },
+        {
+            "name": "KENNIO",
+            "ip": "192.168.254.217"
+        },
+        {
+            "name": "Davi Alvaro",
+            "ip": "192.168.254.153"
+        },
+        {
+            "name": "Sophia",
+            "ip": "192.168.254.143"
+        },
+        {
+            "name": "Catalogos",
+            "ip": "192.168.254.8"
+        },
+        {
+            "name": "MARCELO",
+            "ip": "192.168.254.205"
+        },
+        {
+            "name": "Wellington Alves",
+            "ip": "192.168.254.193"
+        },
+        {
+            "name": "JARBAS",
+            "ip": "192.168.254.97"
+        },
+        {
+            "name": "Luisa - Vendas",
+            "ip": "192.168.254.152"
+        },
+        {
+            "name": "Helvércio",
+            "ip": "192.168.254.45"
+        },
+        {
+            "name": "Bruno",
+            "ip": "192.168.254.171"
+        }
+    ],
+    "workstation_list": [
+        {
+            "name": "sec8425196bb60c",
+            "ip": "192.168.254.12"
+        },
+        {
+            "name": "192.168.254.14",
+            "ip": "192.168.254.14"
+        },
+        {
+            "name": "RELOGIO DE PONTO - 26 BHC",
+            "ip": "192.168.254.26"
+        },
+        {
+            "name": "Religio de Ponto  - 27",
+            "ip": "192.168.254.27"
+        },
+        {
+            "name": "RELOGIO DE PONTO - 28",
+            "ip": "192.168.254.28"
+        },
+        {
+            "name": "RELOGIO DE PONTO - 29 - BHC",
+            "ip": "192.168.254.29"
+        },
+        {
+            "name": "RICOH SP3510",
+            "ip": "192.168.254.4"
+        },
+        {
+            "name": "DVR 02 GALPAO REIS",
+            "ip": "192.168.254.48"
+        },
+        {
+            "name": "DVR GALPÃO REIS",
+            "ip": "192.168.254.49"
+        },
+        {
+            "name": "SAMSUNG",
+            "ip": "192.168.254.5"
+        },
+        {
+            "name": "SAMSUNG NOTAS",
+            "ip": "192.168.254.6"
+        },
+        {
+            "name": "Elenice",
+            "ip": "192.168.254.81"
+        },
+        {
+            "name": "Separação 01",
+            "ip": "192.168.254.228"
+        },
+        {
+            "name": "Separação",
+            "ip": "192.168.254.137"
+        },
+        {
+            "name": "Marcão",
+            "ip": "192.168.254.140"
+        },
+        {
+            "name": "Marketing",
+            "ip": "192.168.254.176"
+        },
+        {
+            "name": "Bruno",
+            "ip": "192.168.254.165"
+        },
+        {
+            "name": "Rodrigo",
+            "ip": "192.168.254.235"
+        },
+        {
+            "name": "Thalles",
+            "ip": "192.168.254.240"
+        },
+        {
+            "name": "Gabriel - Expedição",
+            "ip": "192.168.254.221"
+        },
+        {
+            "name": "Conferencia 02",
+            "ip": "192.168.254.78"
+        },
+        {
+            "name": "Edina",
+            "ip": "192.168.254.190"
+        },
+        {
+            "name": "Nathalia",
+            "ip": "192.168.254.106"
+        },
+        {
+            "name": "Ricardo",
+            "ip": "192.168.254.121"
+        },
+        {
+            "name": "João Paulo",
+            "ip": "192.168.254.224"
+        },
+        {
+            "name": "Conferencia",
+            "ip": "192.168.254.68"
+        },
+        {
+            "name": "Expedição 02",
+            "ip": "192.168.254.103"
+        },
+        {
+            "name": "Fabiula",
+            "ip": "192.168.254.155"
+        },
+        {
+            "name": "Conferencia 01",
+            "ip": "192.168.254.209"
+        },
+        {
+            "name": "Alvaro",
+            "ip": "192.168.254.187"
+        },
+        {
+            "name": "Bernardo",
+            "ip": "192.168.254.90"
+        },
+        {
+            "name": "LUISA",
+            "ip": "192.168.254.128"
+        },
+        {
+            "name": "FRED",
+            "ip": "192.168.254.149"
+        }
+    ],
+    "printer_list": [
+        {
+            "name": "EPSON - 2",
+            "ip": "192.168.254.2"
+        },
+        {
+            "name": "Brother 1617",
+            "ip": "192.168.254.21"
+        },
+        {
+            "name": "IMPRESSORA",
+            "ip": "192.168.254.22"
+        },
+        {
+            "name": "Epson - Fred",
+            "ip": "192.168.254.24"
+        },
+        {
+            "name": "Brother 245",
+            "ip": "192.168.254.245"
+        },
+        {
+            "name": "BROTHER",
+            "ip": "192.168.254.31"
+        },
+        {
+            "name": "Epson - 33",
+            "ip": "192.168.254.33"
+        },
+        {
+            "name": "Epson -  9",
+            "ip": "192.168.254.9"
+        }
+    ],
+    "network_list": [
+        {
+            "name": "Router",
+            "ip": "192.168.254.1"
+        }
+    ],
     "other_list": [],
-    "last_update": "27/10/2026 17:47:46"
+    "last_update": "27/10/2026 17:52:15"
 }

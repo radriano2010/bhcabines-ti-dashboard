@@ -8,7 +8,7 @@ import ipaddress
 # CONEXÃO COM A API DO LIBRENMS (Token Atualizado)
 # ==========================================
 LIBRENMS_URL = "http://192.168.254.80:8000/api/v0/devices"
-API_TOKEN = "b738b619722d866d0106f9dfad42321a"
+API_TOKEN = "3423a1646ac316b8280317f3c901f357"
 
 headers = {"X-Auth-Token": API_TOKEN}
 lista_de_dispositivos = []
