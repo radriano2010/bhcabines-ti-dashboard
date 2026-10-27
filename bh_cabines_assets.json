@@ -1,8 +1,8 @@
 {
     "servers": 5,
-    "workstations": 61,
+    "workstations": 64,
     "printers": 8,
-    "networks": 4,
+    "networks": 1,
     "others": 0,
     "server_list": [
         {
@@ -34,6 +34,10 @@
         {
             "name": "192.168.254.14",
             "ip": "192.168.254.14"
+        },
+        {
+            "name": "Suporte - Garantia/Vendas",
+            "ip": "192.168.254.189"
         },
         {
             "name": "RELOGIO DE PONTO - 26 BHC",
@@ -90,6 +94,10 @@
         {
             "name": "LORRAN",
             "ip": "192.168.254.201"
+        },
+        {
+            "name": "WEVERTON",
+            "ip": "192.168.254.229"
         },
         {
             "name": "Separação",
@@ -170,6 +178,10 @@
         {
             "name": "FRANCES",
             "ip": "192.168.254.166"
+        },
+        {
+            "name": "ROBERT",
+            "ip": "192.168.254.238"
         },
         {
             "name": "Ricardo",
@@ -308,22 +320,10 @@
     ],
     "network_list": [
         {
-            "name": "Suporte - Garantia/Vendas",
-            "ip": "192.168.254.189"
-        },
-        {
-            "name": "WEVERTON",
-            "ip": "192.168.254.229"
-        },
-        {
-            "name": "ROBERT",
-            "ip": "192.168.254.238"
-        },
-        {
             "name": "Router",
             "ip": "192.168.254.1"
         }
     ],
     "other_list": [],
-    "last_update": "27/10/2026 18:39:07"
+    "last_update": "27/10/2026 15:43:30"
 }

@@ -1,8 +1,10 @@
 import json
 from datetime import datetime
+from zoneinfo import ZoneInfo
 import requests
 import socket
 import ipaddress
+import re
 
 # ==========================================
 # CONEXÃO COM A API DO LIBRENMS
@@ -71,18 +73,25 @@ for device in lista_de_dispositivos:
     }
     
     # ==========================================
-    # REGRAS DE CLASSIFICAÇÃO REFINADAS
+    # REGRAS DE CLASSIFICAÇÃO RIGOROSAS
     # ==========================================
+    # 1. Servidores
     if any(k in tipo_servico or k in tipo_hardware for k in ["windows server", "linux-server", "enterprise server"]) or ("server" in nome_lower and not any(sub in nome_lower for sub in ["user", "station", "pc"])):
         server_list.append(item_info)
+    # 2. Impressoras
     elif any(k in tipo_hardware or k in nome_lower for k in ["printer", "impressora", "epson", "brother", "hp"]):
         printer_list.append(item_info)
-    elif any(k in tipo_hardware or k in tipo_servico or k in nome_lower for k in ["router", "switch", "rt", "firewall", "gateway"]):
+    # 3. Rede / Switch / Router (Garante que 'rt' seja palavra isolada para evitar falsos positivos como GaranRTia ou WeveRTon)
+    elif any(k in tipo_hardware or k in tipo_servico for k in ["router", "switch", "firewall", "gateway"]) or bool(re.search(r'\brt\b', nome_lower)) or "switch" in nome_lower or "router" in nome_lower:
         network_list.append(item_info)
+    # 4. Estações de Trabalho
     elif any(k in tipo_servico or k in tipo_hardware or k in nome_lower for k in ["workstation", "desktop", "station", "pc", "notebook", "client"]) or any(nome_lower.startswith(prefix) for prefix in ["adm", "tele", "station", "pc", "user"]):
         workstation_list.append(item_info)
     else:
         workstation_list.append(item_info)
+
+# Hora ajustada para o fuso horário de Brasília
+current_time = datetime.now(ZoneInfo("America/Sao_Paulo")).strftime("%d/%m/%Y %H:%M:%S")
 
 # Montagem do dicionário final compatível com o index.html
 dados_json = {
@@ -96,7 +105,7 @@ dados_json = {
     "printer_list": printer_list,
     "network_list": network_list,
     "other_list": other_list,
-    "last_update": datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+    "last_update": current_time
 }
 
 # Salvar no ficheiro bh_cabines_assets.json com suporte a UTF-8
