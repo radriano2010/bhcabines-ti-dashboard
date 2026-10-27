@@ -150,6 +150,12 @@ def main():
         json.dump(dashboard_payload, f, indent=4, ensure_ascii=False)
 
     print("Concluído com sucesso!")
+    
+    print("Total dispositivos LibreNMS:", len(librenms_data.get("devices", [])))
+    if librenms_data.get("devices"):
+        print("Exemplo de dispositivo LibreNMS:", librenms_data.get("devices")[0])
+
+    print("Total hosts Zabbix:", len(zabbix_data.get("hosts", [])))
 
 
 if __name__ == "__main__":
