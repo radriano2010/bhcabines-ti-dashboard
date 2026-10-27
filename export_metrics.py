@@ -45,3 +45,12 @@ dados_json = {
 }
 
 # Salvar no arquivo bh_cabines_assets.json...
+# 3. Execute o script para gerar o novo JSON limpo
+python3 export_metrics.py
+
+# 4. Adicione, faça o commit e envie diretamente
+git add export_metrics.py bh_cabines_assets.json
+git commit -m "feat: atualiza script e json corretamente"
+git push origin main
+
+
