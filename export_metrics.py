@@ -1,163 +1,36 @@
+# Exemplo da estrutura correta no export_metrics.py
 
-import json
-import os
-from datetime import datetime, timedelta
-import requests
+ativos_processados = []
 
-# --- Configurações dos Servidores ---
-ZABBIX_URL = "http://192.168.254.80:8080/api_jsonrpc.php"
-ZABBIX_USER = "admin_novo"
-ZABBIX_PASS = "zabbix"
-
-LIBRENMS_URL = "http://192.168.254.80:8000/api/v0"
-LIBRENMS_TOKEN = "187c6bb55546da8ca383996ef98ca5ac"
-
-OUTPUT_FILE = "bh_cabines_assets.json"
-
-
-def get_zabbix_data():
-    data_summary = {"status": "error", "hosts": [], "problems": []}
-    try:
-        auth_payload = {
-            "jsonrpc": "2.0",
-            "method": "user.login",
-            "params": {"username": ZABBIX_USER, "password": ZABBIX_PASS},
-            "id": 1,
-        }
-        response = requests.post(ZABBIX_URL, json=auth_payload, timeout=10)
-        result = response.json()
-
-        if "result" not in result:
-            return data_summary
-
-        auth_token = result["result"]
-
-        hosts_payload = {
-            "jsonrpc": "2.0",
-            "method": "host.get",
-            "params": {
-                "output": ["hostid", "host", "name", "status"],
-                "selectInterfaces": ["ip"]
-            },
-            "auth": auth_token,
-            "id": 2,
-        }
-        hosts_res = requests.post(ZABBIX_URL, json=hosts_payload, timeout=10).json()
+for device in lista_de_dispositivos:
+    ip_addr = device.get("ip") or device.get("hostname")
+    
+    # 1. Ignorar o IP de gateway do Docker para evitar redundância
+    if ip_addr == "172.17.0.1":
+        continue
         
-        if "result" in hosts_res:
-            data_summary["hosts"] = hosts_res["result"]
-
-        data_summary["status"] = "success"
-    except Exception as e:
-        print(f"Erro Zabbix: {e}")
-
-    return data_summary
-
-
-def get_librenms_data():
-    devices_summary = {"status": "error", "devices": []}
-    try:
-        headers = {"X-Auth-Token": LIBRENMS_TOKEN}
-        response = requests.get(f"{LIBRENMS_URL}/devices", headers=headers, timeout=10)
-        
-        if response.status_code == 200:
-            result = response.json()
-            devices_summary["devices"] = result.get("devices", [])
-            devices_summary["status"] = "success"
-    except Exception as e:
-        print(f"Erro LibreNMS: {e}")
-
-    return devices_summary
-
-
-def classify_and_add(name, ip, tipo, hardware, os_name, server_list, workstation_list, printer_list, network_list, other_list):
-    name_lower = str(name).lower() if name else ""
-    tipo_lower = str(tipo).lower() if tipo else ""
-    hardware_lower = str(hardware).lower() if hardware else ""
-    os_lower = str(os_name).lower() if os_name else ""
-    ip_str = str(ip) if ip else ""
-
-    device_info = {"name": name, "ip": ip}
-
-    server_keys = ["server", "srv", "db", "database", "ubuntu", "debian", "centos", "windows server", "vm", "virtual", "guardian"]
-    workstation_keys = ["workstation", "desktop", "pc", "client", "notebook", "laptop", "usuario"]
-    printer_keys = ["printer", "laserjet", "mfc", "print", "epson", "brother", "hp", "xerox"]
-    network_keys = ["switch", "router", "firewall", "gateway", "net", "ap", "access point", "roteador", "hub", "routerer106"]
-
-    if any(k in name_lower or k in tipo_lower or k in hardware_lower or k in os_lower for k in server_keys):
-        server_list.append(device_info)
-    elif any(k in name_lower or k in tipo_lower or k in hardware_lower or k in os_lower for k in workstation_keys):
-        workstation_list.append(device_info)
-    elif any(k in name_lower or k in tipo_lower or k in hardware_lower for k in printer_keys):
-        printer_list.append(device_info)
-    elif any(k in name_lower or k in tipo_lower or k in hardware_lower for k in network_keys):
-        network_list.append(device_info)
-    elif ip_str.startswith("192.168.254."):
-        network_list.append(device_info)
+    # 2. Recolher e normalizar dados de nome e tipo
+    nome = device.get("display") or device.get("sysName") or device.get("hostname") or "Desconhecido"
+    tipo_hardware = str(device.get("hardware", "")).lower()
+    tipo_servico = str(device.get("type", "")).lower()
+    
+    # 3. Lógica robusta de classificação por categorias
+    if "server" in tipo_servico or "linux" in tipo_hardware or "windows server" in tipo_hardware or "ubuntu" in nome.lower():
+        categoria = "Servidores"
+    elif "printer" in tipo_hardware or "impressora" in nome.lower() or "epson" in nome.lower() or "brother" in nome.lower():
+        categoria = "Impressoras"
+    elif "router" in tipo_hardware or "switch" in tipo_hardware or "rt" in nome.lower() or "router" in nome.lower():
+        categoria = "Rede / SW / RT"
+    elif "workstation" in tipo_servico or "desktop" in tipo_hardware or "station" in tipo_servico:
+        categoria = "Estações"
     else:
-        other_list.append(device_info)
-
-
-def main():
-    print("Coletando dados...")
-    zabbix_data = get_zabbix_data()
-    librenms_data = get_librenms_data()
-
-    server_list = []
-    workstation_list = []
-    printer_list = []
-    network_list = []
-    other_list = []
-
-    for device in librenms_data.get("devices", []):
-        ip_addr = device.get("ip", "IP não retornado")
-        if ip_addr == "172.17.0.1":
-          continue
-        hostname = device.get("display") or device.get("hostname") or device.get("sysName")
-        if not hostname or hostname == ip_addr:
-            hostname = device.get("sysName") or f"Dispositivo ({ip_addr})"
+        # Se não cair em nenhuma categoria anterior, vai para Outros
+        categoria = "Outros"
         
-        tipo = device.get("type", "")
-        hardware = device.get("hardware", "")
-        os_name = device.get("os", "")
-
-        classify_and_add(hostname, ip_addr, tipo, hardware, os_name, server_list, workstation_list, printer_list, network_list, other_list)
-
-    for host in zabbix_data.get("hosts", []):
-        name = host.get("name") or host.get("host", "Desconhecido")
-        interfaces = host.get("interfaces", [])
-        ip_addr = interfaces[0].get("ip") if interfaces else "IP não retornado"
-        
-        classify_and_add(name, ip_addr, name, "", "", server_list, workstation_list, printer_list, network_list, other_list)
-
-    horario_brasilia = datetime.utcnow() - timedelta(hours=3)
-
-    dashboard_payload = {
-        "last_update": horario_brasilia.strftime("%Y-%m-%d %H:%M:%S"),
-        "zabbix": zabbix_data,
-        "librenms": librenms_data,
-        "servers": len(server_list),
-        "workstations": len(workstation_list),
-        "printers": len(printer_list),
-        "networks": len(network_list),
-        "others": len(other_list),
-        "server_list": server_list,
-        "workstation_list": workstation_list,
-        "printer_list": printer_list,
-        "network_list": network_list,
-        "other_list": other_list,
-    }
-
-    with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
-        json.dump(dashboard_payload, f, indent=4, ensure_ascii=False)
-
-    print("Concluído com sucesso!")
+    # Adicionar o ativo devidamente categorizado
+    ativos_processados.append({
+        "nome": nome,
+        "ip": ip_addr,
+        "categoria": categoria
+    })
     
-    print("Total dispositivos LibreNMS:", len(librenms_data.get("devices", [])))
-    if librenms_data.get("devices"):
-        print("Exemplo de dispositivo LibreNMS:", librenms_data.get("devices")[0])
-
-    print("Total hosts Zabbix:", len(zabbix_data.get("hosts", [])))
-    
-if __name__ == "__main__":
-    main()
