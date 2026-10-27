@@ -1,9 +1,9 @@
 {
     "servers": 5,
-    "workstations": 64,
-    "printers": 8,
+    "workstations": 58,
+    "printers": 10,
     "networks": 1,
-    "others": 0,
+    "others": 4,
     "server_list": [
         {
             "name": "Server Guardian",
@@ -40,22 +40,6 @@
             "ip": "192.168.254.189"
         },
         {
-            "name": "RELOGIO DE PONTO - 26 BHC",
-            "ip": "192.168.254.26"
-        },
-        {
-            "name": "Religio de Ponto  - 27",
-            "ip": "192.168.254.27"
-        },
-        {
-            "name": "RELOGIO DE PONTO - 28",
-            "ip": "192.168.254.28"
-        },
-        {
-            "name": "RELOGIO DE PONTO - 29 - BHC",
-            "ip": "192.168.254.29"
-        },
-        {
             "name": "RICOH SP3510",
             "ip": "192.168.254.4"
         },
@@ -70,14 +54,6 @@
         {
             "name": "DVR GALPÃO REIS",
             "ip": "192.168.254.49"
-        },
-        {
-            "name": "SAMSUNG",
-            "ip": "192.168.254.5"
-        },
-        {
-            "name": "SAMSUNG NOTAS",
-            "ip": "192.168.254.6"
         },
         {
             "name": "Elenice",
@@ -314,6 +290,14 @@
             "ip": "192.168.254.33"
         },
         {
+            "name": "SAMSUNG",
+            "ip": "192.168.254.5"
+        },
+        {
+            "name": "SAMSUNG NOTAS",
+            "ip": "192.168.254.6"
+        },
+        {
             "name": "Epson -  9",
             "ip": "192.168.254.9"
         }
@@ -324,6 +308,23 @@
             "ip": "192.168.254.1"
         }
     ],
-    "other_list": [],
-    "last_update": "27/10/2026 15:43:30"
+    "other_list": [
+        {
+            "name": "RELOGIO DE PONTO - 26 BHC",
+            "ip": "192.168.254.26"
+        },
+        {
+            "name": "Religio de Ponto  - 27",
+            "ip": "192.168.254.27"
+        },
+        {
+            "name": "RELOGIO DE PONTO - 28",
+            "ip": "192.168.254.28"
+        },
+        {
+            "name": "RELOGIO DE PONTO - 29 - BHC",
+            "ip": "192.168.254.29"
+        }
+    ],
+    "last_update": "27/10/2026 15:53:12"
 }

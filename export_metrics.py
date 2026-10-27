@@ -75,13 +75,16 @@ for device in lista_de_dispositivos:
     # ==========================================
     # REGRAS DE CLASSIFICAÇÃO RIGOROSAS
     # ==========================================
+    # 0. Outros / Appliances (Relógios de ponto, etc.)
+    if any(k in tipo_servico or k in tipo_hardware for k in ["appliance"]) or "relogio" in nome_lower:
+        other_list.append(item_info)
     # 1. Servidores
-    if any(k in tipo_servico or k in tipo_hardware for k in ["windows server", "linux-server", "enterprise server"]) or ("server" in nome_lower and not any(sub in nome_lower for sub in ["user", "station", "pc"])):
+    elif any(k in tipo_servico or k in tipo_hardware for k in ["windows server", "linux-server", "enterprise server"]) or ("server" in nome_lower and not any(sub in nome_lower for sub in ["user", "station", "pc"])):
         server_list.append(item_info)
     # 2. Impressoras
-    elif any(k in tipo_hardware or k in nome_lower for k in ["printer", "impressora", "epson", "brother", "hp"]):
+    elif any(k in tipo_hardware or k in nome_lower for k in ["printer", "impressora", "epson", "brother", "hp", "samsung"]):
         printer_list.append(item_info)
-    # 3. Rede / Switch / Router (Garante que 'rt' seja palavra isolada para evitar falsos positivos como GaranRTia ou WeveRTon)
+    # 3. Rede / Switch / Router
     elif any(k in tipo_hardware or k in tipo_servico for k in ["router", "switch", "firewall", "gateway"]) or bool(re.search(r'\brt\b', nome_lower)) or "switch" in nome_lower or "router" in nome_lower:
         network_list.append(item_info)
     # 4. Estações de Trabalho
