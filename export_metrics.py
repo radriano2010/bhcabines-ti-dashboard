@@ -73,22 +73,22 @@ for device in lista_de_dispositivos:
     }
     
     # ==========================================
-    # REGRAS DE CLASSIFICAÇÃO RIGOROSAS
+    # REGRAS DE CLASSIFICAÇÃO COM PRIORIDADE
     # ==========================================
     # 0. Outros / Appliances (Relógios de ponto, etc.)
     if any(k in tipo_servico or k in tipo_hardware for k in ["appliance"]) or "relogio" in nome_lower:
         other_list.append(item_info)
-    # 1. Servidores
+    # 1. Impressoras (Prioridade para capturar qualquer tipo "print" ou marcas conhecidas)
+    elif "print" in tipo_servico or any(k in tipo_hardware or k in nome_lower for k in ["printer", "impressora", "epson", "brother", "hp", "samsung", "ricoh"]):
+        printer_list.append(item_info)
+    # 2. Servidores
     elif any(k in tipo_servico or k in tipo_hardware for k in ["windows server", "linux-server", "enterprise server"]) or ("server" in nome_lower and not any(sub in nome_lower for sub in ["user", "station", "pc"])):
         server_list.append(item_info)
-    # 2. Impressoras (Adicionado "ricoh" aqui)
-    elif any(k in tipo_hardware or k in nome_lower for k in ["printer", "impressora", "epson", "brother", "hp", "samsung", "ricoh"]):
-        printer_list.append(item_info)
     # 3. Rede / Switch / Router
     elif any(k in tipo_hardware or k in tipo_servico for k in ["router", "switch", "firewall", "gateway"]) or bool(re.search(r'\brt\b', nome_lower)) or "switch" in nome_lower or "router" in nome_lower:
         network_list.append(item_info)
     # 4. Estações de Trabalho
-    elif any(k in tipo_servico or k in tipo_hardware or k in nome_lower for k in ["workstation", "desktop", "station", "pc", "notebook", "client"]) or any(nome_lower.startswith(prefix) for prefix in ["adm", "tele", "station", "pc", "user"]):
+    elif any(k in tipo_servico or k in tipo_hardware or k in nome_lower for k in ["workstation", "desktop", "station", "pc", "notebook", "client"]) or any(nome_lower.startswith(prefix) for prefix in ["adm", "tele", "station", "pc", "user", "sec"]):
         workstation_list.append(item_info)
     else:
         workstation_list.append(item_info)

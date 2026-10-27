@@ -1,7 +1,7 @@
 {
     "servers": 5,
-    "workstations": 57,
-    "printers": 11,
+    "workstations": 56,
+    "printers": 12,
     "networks": 1,
     "others": 4,
     "server_list": [
@@ -27,10 +27,6 @@
         }
     ],
     "workstation_list": [
-        {
-            "name": "sec8425196bb60c",
-            "ip": "192.168.254.12"
-        },
         {
             "name": "192.168.254.14",
             "ip": "192.168.254.14"
@@ -258,6 +254,10 @@
     ],
     "printer_list": [
         {
+            "name": "PRINTER SAMSUNG",
+            "ip": "192.168.254.12"
+        },
+        {
             "name": "EPSON - 2",
             "ip": "192.168.254.2"
         },
@@ -314,7 +314,7 @@
             "ip": "192.168.254.26"
         },
         {
-            "name": "Religio de Ponto  - 27",
+            "name": "RELOGIO PONTO - 27",
             "ip": "192.168.254.27"
         },
         {
@@ -326,5 +326,5 @@
             "ip": "192.168.254.29"
         }
     ],
-    "last_update": "27/10/2026 15:56:31"
+    "last_update": "27/10/2026 16:06:25"
 }
