@@ -157,9 +157,5 @@ def main():
 
     print("Total hosts Zabbix:", len(zabbix_data.get("hosts", [])))
     
-    # Ignorar IPs internos de gateway/Docker que geram duplicados
-if ip_addr == "172.17.0.1":
-    continue
-
 if __name__ == "__main__":
     main()
