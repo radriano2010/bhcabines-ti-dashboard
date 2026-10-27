@@ -1,15 +1,38 @@
 import json
 from datetime import datetime
 import requests
+import socket
+import ipaddress
 
 # ==========================================
 # CONEXÃO COM A API DO LIBRENMS
 # ==========================================
 LIBRENMS_URL = "http://localhost/api/v0/devices"
-API_TOKEN = "f04fe37740e13a0da46989a4b1ac166d"  # <-- Insira aqui o seu token da API do LibreNMS
+API_TOKEN = "f04fe37740e13a0da46989a4b1ac166d"
 
 headers = {"X-Auth-Token": API_TOKEN}
 lista_de_dispositivos = []
+
+def parse_ip(raw_ip):
+    """Converte IPs retornados em formato binário, inteiro ou string para x.x.x.x"""
+    if not raw_ip:
+        return "Desconhecido"
+    if isinstance(raw_ip, bytes):
+        try:
+            return socket.inet_ntoa(raw_ip)
+        except:
+            return str(raw_ip)
+    if isinstance(raw_ip, str) and len(raw_ip) == 4 and not any(c.isdigit() for c in raw_ip):
+        try:
+            return socket.inet_ntoa(raw_ip.encode('latin1'))
+        except:
+            pass
+    if isinstance(raw_ip, int):
+        try:
+            return str(ipaddress.IPv4Address(raw_ip))
+        except:
+            pass
+    return str(raw_ip)
 
 try:
     response = requests.get(LIBRENMS_URL, headers=headers, timeout=10)
@@ -29,12 +52,16 @@ network_list = []
 other_list = []
 
 for device in lista_de_dispositivos:
-    ip_addr = device.get("ip") or device.get("hostname")
+    raw_ip = device.get("ip") or device.get("hostname")
+    ip_addr = parse_ip(raw_ip)
     
-    if ip_addr == "172.17.0.1":
-        continue
+    if ip_addr in ["172.17.0.1", "127.0.0.1", "Desconhecido"]:
+        # Ignorar loopback se desejado ou tratar conforme regra
+        if ip_addr == "172.17.0.1":
+            continue
 
     nome = device.get("display") or device.get("sysName") or device.get("hostname") or "Desconhecido"
+    nome_lower = nome.lower()
     tipo_hardware = str(device.get("hardware", "")).lower()
     tipo_servico = str(device.get("type", "")).lower()
     
@@ -43,13 +70,19 @@ for device in lista_de_dispositivos:
         "ip": ip_addr
     }
     
-    if "server" in tipo_servico or "linux" in tipo_hardware or "windows server" in tipo_hardware or "ubuntu" in nome.lower():
+    # ==========================================
+    # REGRAS DE CLASSIFICAÇÃO CORRIGIDAS
+    # ==========================================
+    if any(k in tipo_servico or k in tipo_hardware or k in nome_lower for k in ["server", "windows server", "ubuntu", "linux-server"]):
         server_list.append(item_info)
-    elif "printer" in tipo_hardware or "impressora" in nome.lower() or "epson" in nome.lower() or "brother" in nome.lower():
+    elif any(k in tipo_hardware or k in nome_lower for k in ["printer", "impressora", "epson", "brother", "hp"]):
         printer_list.append(item_info)
-    elif "router" in tipo_hardware or "switch" in tipo_hardware or "rt" in nome.lower() or "router" in nome.lower():
+    elif any(k in tipo_hardware or k in tipo_servico or k in nome_lower for k in ["router", "switch", "rt", "firewall", "gateway"]):
         network_list.append(item_info)
-    elif "workstation" in tipo_servico or "desktop" in tipo_hardware or "station" in tipo_servico:
+    elif any(k in tipo_servico or k in tipo_hardware or k in nome_lower for k in ["workstation", "desktop", "station", "pc", "notebook"]) or any(nome_lower.startswith(prefix) for prefix in ["adm", "tele", "station", "pc"]):
+        workstation_list.append(item_info)
+    elif nome_lower in ["bernardo", "luisa", "catalogos", "guardian"] or (len(nome_lower) > 0 and not any(k in nome_lower for k in ["srv", "sw", "rt"])):
+        # Identificação de estações nomeadas por utilizadores/ambientes de escritório
         workstation_list.append(item_info)
     else:
         other_list.append(item_info)
