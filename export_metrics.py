@@ -6,7 +6,7 @@ import requests
 # CONEXÃO COM A API DO LIBRENMS
 # ==========================================
 LIBRENMS_URL = "http://localhost/api/v0/devices"
-API_TOKEN = "2e9fc5f782b2764de511e7daf6482751"  # <-- Insira aqui o seu token da API do LibreNMS
+API_TOKEN = "f04fe37740e13a0da46989a4b1ac166d"  # <-- Insira aqui o seu token da API do LibreNMS
 
 headers = {"X-Auth-Token": API_TOKEN}
 lista_de_dispositivos = []
