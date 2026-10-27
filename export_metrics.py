@@ -1,11 +1,26 @@
 import json
 from datetime import datetime
+import requests
 
 # ==========================================
-# ORIGEM DOS DADOS (Substitua por onde obtém os seus dispositivos)
-# Exemplo: lista_de_dispositivos = [...]
+# CONEXÃO COM A API DO LIBRENMS
 # ==========================================
-lista_de_dispositivos = [] # <-- Garanta que os seus dados reais entram aqui
+LIBRENMS_URL = "http://localhost/api/v0/devices"
+API_TOKEN = "2e9fc5f782b2764de511e7daf6482751"  # <-- Insira aqui o seu token da API do LibreNMS
+
+headers = {"X-Auth-Token": API_TOKEN}
+lista_de_dispositivos = []
+
+try:
+    response = requests.get(LIBRENMS_URL, headers=headers, timeout=10)
+    if response.status_code == 200:
+        data = response.json()
+        lista_de_dispositivos = data.get("devices", [])
+        print(f"Total de dispositivos obtidos do LibreNMS: {len(lista_de_dispositivos)}")
+    else:
+        print(f"Erro ao contactar a API do LibreNMS: {response.status_code}")
+except Exception as e:
+    print(f"Erro de conexão com o LibreNMS: {e}")
 
 server_list = []
 workstation_list = []
@@ -39,6 +54,7 @@ for device in lista_de_dispositivos:
     else:
         other_list.append(item_info)
 
+# Montagem do dicionário final compatível com o index.html
 dados_json = {
     "servers": len(server_list),
     "workstations": len(workstation_list),
@@ -53,7 +69,8 @@ dados_json = {
     "last_update": datetime.now().strftime("%d/%m/%Y %H:%M:%S")
 }
 
+# Salvar no ficheiro bh_cabines_assets.json com suporte a UTF-8
 with open("bh_cabines_assets.json", "w", encoding="utf-8") as f:
     json.dump(dados_json, f, ensure_ascii=False, indent=4)
 
-print("Ficheiro bh_cabines_assets.json atualizado com sucesso!")
+print("Ficheiro bh_cabines_assets.json gerado com sucesso via LibreNMS!")
