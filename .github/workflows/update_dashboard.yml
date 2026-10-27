@@ -1,0 +1,37 @@
+name: Auto Update Dashboard
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+  schedule:
+    # Roda a cada 30 minutos (pode ajustar se preferir)
+    - cron: '*/30 * * * *'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests
+
+      - name: Run export script
+        run: python export_metrics.py
+
+      - name: Commit and push if changes happened
+        run: |
+          git config --global user.name "GitHub Actions Bot"
+          git config --global user.email "actions@github.com"
+          git add bh_cabines_assets.json
+          git diff --quiet && git diff --staged --quiet || (git commit -m "Auto-update inventario $(date +'%Y-%m-%d %H:%M:%S')" && git push)
