@@ -1,3 +1,4 @@
+
 import json
 import os
 from datetime import datetime, timedelta
@@ -70,20 +71,26 @@ def get_librenms_data():
 
 
 def classify_and_add(name, ip, tipo, hardware, os_name, server_list, workstation_list, printer_list, network_list, other_list):
-    name_lower = str(name).lower()
-    tipo_lower = str(tipo).lower()
-    hardware_lower = str(hardware).lower()
-    os_lower = str(os_name).lower()
+    name_lower = str(name).lower() if name else ""
+    tipo_lower = str(tipo).lower() if tipo else ""
+    hardware_lower = str(hardware).lower() if hardware else ""
+    os_lower = str(os_name).lower() if os_name else ""
 
     device_info = {"name": name, "ip": ip}
 
-    if any(k in name_lower or k in tipo_lower or k in hardware_lower or k in os_lower for k in ["server", "srv", "db", "ubuntu", "guardian"]):
+    # Palavras-chave expandidas e mais abrangentes
+    server_keys = ["server", "srv", "db", "database", "ubuntu", "debian", "centos", "windows server", "vm", "virtual", "guardian"]
+    workstation_keys = ["workstation", "desktop", "pc", "client", "notebook", "laptop", "usuario"]
+    printer_keys = ["printer", "laserjet", "mfc", "print", "epson", "brother", "hp", "xerox"]
+    network_keys = ["switch", "router", "firewall", "gateway", "net", "ap", "access point", "roteador", "hub", "routerer106"]
+
+    if any(k in name_lower or k in tipo_lower or k in hardware_lower or k in os_lower for k in server_keys):
         server_list.append(device_info)
-    elif any(k in name_lower or k in tipo_lower or k in hardware_lower or k in os_lower for k in ["workstation", "desktop", "pc", "client"]):
+    elif any(k in name_lower or k in tipo_lower or k in hardware_lower or k in os_lower for k in workstation_keys):
         workstation_list.append(device_info)
-    elif any(k in name_lower or k in tipo_lower or k in hardware_lower for k in ["printer", "laserjet", "mfc", "print", "epson", "brother"]):
+    elif any(k in name_lower or k in tipo_lower or k in hardware_lower for k in printer_keys):
         printer_list.append(device_info)
-    elif any(k in name_lower or k in tipo_lower or k in hardware_lower for k in ["switch", "router", "firewall", "gateway", "net"]):
+    elif any(k in name_lower or k in tipo_lower or k in hardware_lower for k in network_keys):
         network_list.append(device_info)
     else:
         other_list.append(device_info)
@@ -117,9 +124,10 @@ def main():
         interfaces = host.get("interfaces", [])
         ip_addr = interfaces[0].get("ip") if interfaces else "IP não retornado"
         
-        classify_and_add(name, ip_addr, "", "", "", server_list, workstation_list, printer_list, network_list, other_list)
+        # Passando o próprio nome como base para ajudar a classificar caso não haja 'tipo' explícito
+        classify_and_add(name, ip_addr, name, "", "", server_list, workstation_list, printer_list, network_list, other_list)
 
-    # Hora corrigida de Brasília (UTC - 3 horas)
+    # Hora de Brasília (UTC - 3 horas)
     horario_brasilia = datetime.utcnow() - timedelta(hours=3)
 
     dashboard_payload = {
@@ -146,4 +154,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
