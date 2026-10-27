@@ -5,10 +5,10 @@ import socket
 import ipaddress
 
 # ==========================================
-# CONEXÃO COM A API DO LIBRENMS (URL Direta na Porta 8000)
+# CONEXÃO COM A API DO LIBRENMS (Token Atualizado)
 # ==========================================
 LIBRENMS_URL = "http://192.168.254.80:8000/api/v0/devices"
-API_TOKEN = "f04fe37740e13a0da46989a4b1ac166d"
+API_TOKEN = "b738b619722d866d0106f9dfad42321a"
 
 headers = {"X-Auth-Token": API_TOKEN}
 lista_de_dispositivos = []
