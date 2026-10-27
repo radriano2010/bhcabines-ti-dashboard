@@ -5,7 +5,7 @@ import socket
 import ipaddress
 
 # ==========================================
-# CONEXÃO COM A API DO LIBRENMS (Token Atualizado)
+# CONEXÃO COM A API DO LIBRENMS
 # ==========================================
 LIBRENMS_URL = "http://192.168.254.80:8000/api/v0/devices"
 API_TOKEN = "3423a1646ac316b8280317f3c901f357"
@@ -71,20 +71,18 @@ for device in lista_de_dispositivos:
     }
     
     # ==========================================
-    # REGRAS DE CLASSIFICAÇÃO
+    # REGRAS DE CLASSIFICAÇÃO REFINADAS
     # ==========================================
-    if any(k in tipo_servico or k in tipo_hardware or k in nome_lower for k in ["server", "windows server", "ubuntu", "linux-server"]):
+    if any(k in tipo_servico or k in tipo_hardware for k in ["windows server", "linux-server", "enterprise server"]) or ("server" in nome_lower and not any(sub in nome_lower for sub in ["user", "station", "pc"])):
         server_list.append(item_info)
     elif any(k in tipo_hardware or k in nome_lower for k in ["printer", "impressora", "epson", "brother", "hp"]):
         printer_list.append(item_info)
     elif any(k in tipo_hardware or k in tipo_servico or k in nome_lower for k in ["router", "switch", "rt", "firewall", "gateway"]):
         network_list.append(item_info)
-    elif any(k in tipo_servico or k in tipo_hardware or k in nome_lower for k in ["workstation", "desktop", "station", "pc", "notebook"]) or any(nome_lower.startswith(prefix) for prefix in ["adm", "tele", "station", "pc"]):
-        workstation_list.append(item_info)
-    elif nome_lower in ["bernardo", "luisa", "catalogos", "guardian"] or (len(nome_lower) > 0 and not any(k in nome_lower for k in ["srv", "sw", "rt"])):
+    elif any(k in tipo_servico or k in tipo_hardware or k in nome_lower for k in ["workstation", "desktop", "station", "pc", "notebook", "client"]) or any(nome_lower.startswith(prefix) for prefix in ["adm", "tele", "station", "pc", "user"]):
         workstation_list.append(item_info)
     else:
-        other_list.append(item_info)
+        workstation_list.append(item_info)
 
 # Montagem do dicionário final compatível com o index.html
 dados_json = {
