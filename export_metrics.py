@@ -111,6 +111,8 @@ def main():
 
     for device in librenms_data.get("devices", []):
         ip_addr = device.get("ip", "IP não retornado")
+        if ip_addr == "172.17.0.1":
+          continue
         hostname = device.get("display") or device.get("hostname") or device.get("sysName")
         if not hostname or hostname == ip_addr:
             hostname = device.get("sysName") or f"Dispositivo ({ip_addr})"
