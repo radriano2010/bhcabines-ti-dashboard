@@ -5,9 +5,9 @@ import socket
 import ipaddress
 
 # ==========================================
-# CONEXÃO COM A API DO LIBRENMS
+# CONEXÃO COM A API DO LIBRENMS (URL Direta na Porta 8000)
 # ==========================================
-LIBRENMS_URL = "http://localhost/api/v0/devices"
+LIBRENMS_URL = "http://192.168.254.80:8000/api/v0/devices"
 API_TOKEN = "f04fe37740e13a0da46989a4b1ac166d"
 
 headers = {"X-Auth-Token": API_TOKEN}
@@ -36,12 +36,13 @@ def parse_ip(raw_ip):
 
 try:
     response = requests.get(LIBRENMS_URL, headers=headers, timeout=10)
+    print(f"Status Code da API: {response.status_code}")
     if response.status_code == 200:
         data = response.json()
         lista_de_dispositivos = data.get("devices", [])
         print(f"Total de dispositivos obtidos do LibreNMS: {len(lista_de_dispositivos)}")
     else:
-        print(f"Erro ao contactar a API do LibreNMS: {response.status_code}")
+        print(f"Erro ao contactar a API do LibreNMS: {response.status_code} - Resposta: {response.text}")
 except Exception as e:
     print(f"Erro de conexão com o LibreNMS: {e}")
 
@@ -56,7 +57,6 @@ for device in lista_de_dispositivos:
     ip_addr = parse_ip(raw_ip)
     
     if ip_addr in ["172.17.0.1", "127.0.0.1", "Desconhecido"]:
-        # Ignorar loopback se desejado ou tratar conforme regra
         if ip_addr == "172.17.0.1":
             continue
 
@@ -71,7 +71,7 @@ for device in lista_de_dispositivos:
     }
     
     # ==========================================
-    # REGRAS DE CLASSIFICAÇÃO CORRIGIDAS
+    # REGRAS DE CLASSIFICAÇÃO
     # ==========================================
     if any(k in tipo_servico or k in tipo_hardware or k in nome_lower for k in ["server", "windows server", "ubuntu", "linux-server"]):
         server_list.append(item_info)
@@ -82,7 +82,6 @@ for device in lista_de_dispositivos:
     elif any(k in tipo_servico or k in tipo_hardware or k in nome_lower for k in ["workstation", "desktop", "station", "pc", "notebook"]) or any(nome_lower.startswith(prefix) for prefix in ["adm", "tele", "station", "pc"]):
         workstation_list.append(item_info)
     elif nome_lower in ["bernardo", "luisa", "catalogos", "guardian"] or (len(nome_lower) > 0 and not any(k in nome_lower for k in ["srv", "sw", "rt"])):
-        # Identificação de estações nomeadas por utilizadores/ambientes de escritório
         workstation_list.append(item_info)
     else:
         other_list.append(item_info)
