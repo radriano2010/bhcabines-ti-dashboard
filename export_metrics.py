@@ -81,8 +81,8 @@ for device in lista_de_dispositivos:
     # 1. Servidores
     elif any(k in tipo_servico or k in tipo_hardware for k in ["windows server", "linux-server", "enterprise server"]) or ("server" in nome_lower and not any(sub in nome_lower for sub in ["user", "station", "pc"])):
         server_list.append(item_info)
-    # 2. Impressoras
-    elif any(k in tipo_hardware or k in nome_lower for k in ["printer", "impressora", "epson", "brother", "hp", "samsung"]):
+    # 2. Impressoras (Adicionado "ricoh" aqui)
+    elif any(k in tipo_hardware or k in nome_lower for k in ["printer", "impressora", "epson", "brother", "hp", "samsung", "ricoh"]):
         printer_list.append(item_info)
     # 3. Rede / Switch / Router
     elif any(k in tipo_hardware or k in tipo_servico for k in ["router", "switch", "firewall", "gateway"]) or bool(re.search(r'\brt\b', nome_lower)) or "switch" in nome_lower or "router" in nome_lower:
