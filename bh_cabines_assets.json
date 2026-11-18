@@ -1,7 +1,7 @@
 {
     "servers": 5,
     "workstations": 56,
-    "printers": 11,
+    "printers": 12,
     "networks": 1,
     "others": 4,
     "server_list": [
@@ -262,8 +262,20 @@
             "ip": "192.168.254.2"
         },
         {
+            "name": "Brother 1617",
+            "ip": "192.168.254.21"
+        },
+        {
+            "name": "Brother",
+            "ip": "192.168.254.22"
+        },
+        {
             "name": "Epson - Fred",
             "ip": "192.168.254.24"
+        },
+        {
+            "name": "Brother 245",
+            "ip": "192.168.254.245"
         },
         {
             "name": "Brother",
@@ -288,14 +300,6 @@
         {
             "name": "Epson -  9",
             "ip": "192.168.254.9"
-        },
-        {
-            "name": "IMPRESSORA BROTHER 5212",
-            "ip": "192.168.254.21"
-        },
-        {
-            "name": "192.168.254.22",
-            "ip": "192.168.254.22"
         }
     ],
     "network_list": [
@@ -322,5 +326,5 @@
             "ip": "192.168.254.29"
         }
     ],
-    "last_update": "18/11/2026 11:10:48"
+    "last_update": "18/11/2026 15:11:02"
 }
